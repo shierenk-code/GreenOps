@@ -284,26 +284,19 @@ describe('complete control-plane page integration', () => {
   });
 
   it.each(['sunset', 'clean', 'olive', 'dark', 'forest', 'highContrast'])(
-    'supports the %s theme and six accessible theme choices',
+    'preserves the %s theme without displaying a theme picker',
     (theme) => {
       const html = render(`data=sample&theme=${theme}`);
       expect(html).toContain(`data-theme="${theme}"`);
-      for (const label of [
-        'Clean Enterprise Light',
-        'Charcoal &amp; Olive',
-        'Dark Cyber',
-        'Sustainable Forest',
-        'High Contrast',
-      ])
-        expect(html).toContain(`aria-label="${label}"`);
+      expect(html).not.toContain('aria-label="Choose appearance"');
+      expect(html).not.toContain('aria-label="Dashboard theme"');
     },
   );
 
-  it('keeps the appearance menu closed until the user opens it', () => {
+  it('removes the appearance button and menu', () => {
     const html = render('data=sample');
-    expect(html).toContain('aria-label="Choose appearance"');
-    expect(html).toContain('aria-expanded="false"');
-    expect(html).toContain('role="menu" aria-label="Dashboard theme" hidden=""');
+    expect(html).not.toContain('aria-label="Choose appearance"');
+    expect(html).not.toContain('aria-label="Dashboard theme"');
     expect(html).not.toContain('Make it your workspace');
   });
 
@@ -312,12 +305,7 @@ describe('complete control-plane page integration', () => {
     for (const url of links(html)) {
       expect(url.searchParams.get('theme')).toBe('olive');
     }
-    expect(html.indexOf('aria-label="Charcoal &amp; Olive"')).toBeGreaterThan(
-      html.indexOf('aria-label="Clean Enterprise Light"'),
-    );
-    expect(html.indexOf('aria-label="Charcoal &amp; Olive"')).toBeLessThan(
-      html.indexOf('aria-label="Dark Cyber"'),
-    );
+    expect(html).toContain('data-theme="olive"');
   });
 
   it('uses safe defaults for unknown query enum values', () => {
@@ -363,7 +351,7 @@ describe('legacy dashboard route compatibility', () => {
       expect(main(html)).toContain('Workflow remains available');
       expect(main(html)).not.toContain('No recorded analysis loaded');
       expect(html).toContain('data-theme="forest"');
-      expect(html).toContain('aria-label="Dashboard theme"');
+      expect(html).not.toContain('aria-label="Dashboard theme"');
       expect(links(nav(html))).toHaveLength(12);
       for (const url of links(nav(html))) expect(url.pathname).toBe('/dashboard');
     },
@@ -406,6 +394,24 @@ describe('legacy dashboard route compatibility', () => {
 });
 
 describe('integrated review and ledger scope', () => {
+  it('keeps specialist landing pages compact with three findings and collapsed measurements', () => {
+    const html = main(render('data=sample&tab=ai&range=1y'));
+    expect(html).toContain('Resources with findings');
+    expect(html).toContain('Your next step');
+    expect(html).toContain('Change checks passed');
+    expect(html).toMatch(/View all \d+ findings/);
+    const table = html.match(/<table><caption[^>]*>Findings in this selection<\/caption>[\s\S]*?<\/table>/)?.[0] ?? '';
+    expect((table.match(/<tbody>[\s\S]*?<\/tbody>/)?.[0].match(/<tr>/g) ?? []).length).toBe(3);
+    expect(html).toMatch(/<details\b[^>]*><summary>Domain measurements/);
+    expect(html).not.toContain('Before making a change');
+  });
+  it('provides a ranked region selector without presenting intensity as emissions', () => {
+    const html = main(render('data=sample&tab=carbon&range=1y'));
+    expect(html).toContain('Carbon by region');
+    expect(html).toContain('Highest observed grid intensity');
+    expect(html).toContain('Grid intensity is not total workload emissions');
+    expect(html).toContain('Proposed routes off');
+  });
   it.each(['carbon', 'waste', 'ai', 'arch', 'dr', 'collab'])(
     'gives %s four consistent URL-addressable sections',
     (agent) => {

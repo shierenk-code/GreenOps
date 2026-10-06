@@ -1341,6 +1341,20 @@
 .appearance {
   position: relative;
 }
+.dateWindow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dateWindow input {
+  min-height: 40px;
+  padding: 8px;
+  border: 1px solid var(--cp-border);
+  border-radius: 6px;
+  color: var(--cp-text);
+  background: var(--cp-surface);
+}
 .appearanceButton {
   display: grid;
   place-items: center;

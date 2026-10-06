@@ -108,12 +108,7 @@
 .land {
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--cp-muted) 55%, var(--cp-soft)) 1.3px,
-    transparent 1.7px
-  );
-  background-size: 5px 5px;
+  background: color-mix(in srgb, var(--cp-muted) 32%, var(--cp-soft));
   mask: url('/maps/world-land.svg') center / 100% 100% no-repeat;
 }
 .pin {
@@ -148,6 +143,51 @@
   height: 5px;
   background: #fff;
   border-radius: 50%;
+}
+.pinLabel {
+  position: absolute;
+  top: 44px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 5px 8px;
+  background: var(--cp-surface);
+  color: var(--cp-text);
+  border: 1px solid var(--cp-border);
+  font-size: 11px;
+  pointer-events: none;
+}
+.ranking {
+  grid-column: 1 / -1;
+  margin-bottom: 24px;
+}
+.ranking h4 {
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+.ranking button {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 8px;
+  background: transparent;
+  color: var(--cp-text);
+  border: 0;
+  border-bottom: 1px solid var(--cp-border);
+  text-align: left;
+  cursor: pointer;
+  font-size: 12px;
+}
+.ranking button[aria-pressed='true'] {
+  background: var(--cp-soft);
+  border-left: 3px solid var(--cp-accent);
+}
+.ranking small {
+  display: block;
+  color: var(--cp-muted);
+  font-size: 10px;
+  margin-top: 10px;
 }
 .pin[data-band='low'],
 .legend i[data-band='low'] {
@@ -373,7 +413,7 @@
   }
   .readout {
     grid-column: 2;
-    grid-row: 1 / 4;
+    grid-row: 2 / 5;
     margin-top: 0;
   }
   .context,
@@ -462,6 +502,15 @@
   }
 }
 
-.atlas { border-radius: 0; }
-.sourceBadge, .segmented, .segmented button { border-radius: 0; }
-.header h3 { font-family: var(--go-sans); letter-spacing: -1px; }
+.atlas {
+  border-radius: 0;
+}
+.sourceBadge,
+.segmented,
+.segmented button {
+  border-radius: 0;
+}
+.header h3 {
+  font-family: var(--go-sans);
+  letter-spacing: -1px;
+}

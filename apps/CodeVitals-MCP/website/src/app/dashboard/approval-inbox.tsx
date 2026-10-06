@@ -183,7 +183,9 @@ export function useApprovalDecisions(run: SelectedRun | null, findings: Finding[
               failure.message,
             )
               ? failure.message
-              : 'The decision could not be saved to browser storage. Nothing was approved or executed.',
+              : cloud
+                ? 'The account decision could not be saved. Check the connection and try again.'
+                : 'The decision could not be saved to browser storage. Nothing was approved or executed.',
         };
       }
     },

@@ -526,7 +526,7 @@
   display: grid;
   gap: 20px;
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-  grid-template-areas: 'meta meta' 'problem problem' 'evidence recommendation' 'evidence safeguards' 'verification decision' 'manual decision' 'impact impact' 'estimates estimates' 'history history';
+  grid-template-areas: 'meta meta' 'problem problem' 'evidence recommendation' 'evidence safeguards' 'verification decision' 'manual prototype' 'impact impact' 'estimates estimates' 'history history';
   align-items: start;
 }
 .fullPage .cardMeta {
@@ -560,6 +560,16 @@
   border: 1px solid var(--cp-border);
   border-radius: 10px;
   background: var(--cp-surface);
+}
+.prototypeDemo {
+  padding: 22px;
+  border: 1px solid var(--cp-border);
+  border-radius: 10px;
+  background: var(--cp-surface);
+  min-width: 0;
+}
+.fullPage .prototypeDemo {
+  grid-area: prototype;
 }
 @media (max-width: 650px) {
   .milestones {
@@ -596,9 +606,27 @@
 .fullPage .decisionHistory {
   grid-area: history;
 }
-.fullPage .decisionFields {
+.fullPage .decisionPanel {
   grid-area: decision;
+}
+.fullPage .decisionFields {
   grid-template-columns: 1fr;
+}
+.decisionPanel {
+  min-width: 0;
+}
+.decisionActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px 0;
+}
+.decisionActions > span {
+  flex: 1 1 180px;
+  font-size: 11px;
+  color: var(--cp-muted);
 }
 .fullPage .reviewColumns > section,
 .fullPage .history,

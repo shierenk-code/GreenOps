@@ -1,132 +1,129 @@
-# GreenOps Development Setup
+# Setup and testing
 
-Use an authorized checkout of [shierenk-code/GreenOps, branch develop](https://github.com/shierenk-code/GreenOps/tree/develop). For the complete clone-to-demo sequence and expected results, start with the [judge quick start](../../README.md#judge-quick-start-run-the-proof-of-concept). Commands below are PowerShell commands, starting in the repository root (the directory containing pnpm-workspace.yaml). Last reviewed against `develop` on 6 October 2026.
+Start with the [README quick start](../../README.md#quick-start). This guide covers optional setup and common failures. Commands use PowerShell and assume the repository root unless stated otherwise.
 
-## Prerequisites
+## Requirements
 
-- Git and Node.js 22.12+ (22.x, as used in CI) or 24+, per the root `engines` field.
-- pnpm 11.17.0, matching the root package-manager pin.
-- npm for the separately nested website.
+Use Node.js 22.12+ (22.x recommended), npm and pnpm 11.17.0. Install root dependencies with `pnpm.cmd install --frozen-lockfile`; the nested website separately needs `npm.cmd ci`. Keep installation scripts enabled: they apply dependency security patches.
 
-No API key or cloud account is needed for fixture demos. The committed root `.env` selects Gemini, so pass `--provider offline` to `run`, or set `$env:GREENOPS_LLM_PROVIDER = "offline"` before `review`, to avoid model calls. Root and website dependencies need separate installation. Do not use `--ignore-scripts`: install scripts apply dependency security patches.
+Only public, open or synthetic data belongs in hackathon runs. Do not commit private environment files, generated ledgers or session exports.
 
-## Install and generate offline results
+## Choose a dashboard mode
 
-```powershell
-# Repository root
-pnpm.cmd install --frozen-lockfile
-pnpm.cmd build
+| Need                                   | Configuration                                                                                      |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Judge walkthrough without MongoDB      | Leave account-mode settings unset; pin a generated ledger with `GREENOPS_LEDGER_PATH`              |
+| Signed-in workspace with saved history | Configure MongoDB, create/sign into an account, connect the CLI and sync the same synthetic ledger |
+| Browse illustrative UI examples        | Choose **Sample scenarios**; these are separate from both recorded datasets                        |
 
-# Deterministic fleet recommendations: no model API requests
-pnpm.cmd greenops run .\fixtures\greenops-mock --fleet --provider offline --ledger .\greenops-fleet-ledger.json
-```
+Account mode is enabled by any of `MONGODB_URI`, `WEBSITE_HOSTNAME`, or an HTTPS `GREENOPS_PUBLIC_URL`. Merely setting a ledger path does not override account mode.
 
-Run the repository's `greenops` script from the repository root, not your home directory or the website directory. If it cannot be found, first return to the repository root and check installation/build output. The legacy `codevitals` script remains available for existing commands.
+For a no-database walkthrough on an existing installation, remove those settings from that terminal and its environment-file configuration, then restart. Keep the private values securely for restoring your connected setup. A fresh checkout should contain no real credentials.
 
-To review source code instead:
+## Run or rebuild the dashboard
 
-```powershell
-$env:GREENOPS_LLM_PROVIDER = "offline"
-pnpm.cmd greenops review .\fixtures\greenops-sample --ledger .\greenops-ledger.json
-```
-
-The review command uses the provider environment setting; --provider is an option on greenops run. Generic static-code findings are currently absent from the new six-agent UI, so use fleet results for the dashboard walkthrough.
-
-## Start the website in a second terminal
+From the website folder:
 
 ```powershell
-# Starting from repository root
 cd apps/CodeVitals-MCP/website
 npm.cmd ci
-
-# Pin this dataset so a newer code-review ledger does not replace it
-$env:GREENOPS_LEDGER_PATH = "../../../greenops-fleet-ledger.json"
-npm.cmd run dev
+$env:GREENOPS_LEDGER_PATH = "../../../.tmp/judge-baseline.json"
+npm.cmd run dev -- --port 3003
 ```
 
-Open <http://127.0.0.1:3000/dashboard>. The pnpm workspace includes apps/* and packages/*; it does not install/build this nested website. Keep its package-lock.json separate from the root pnpm lockfile.
+Open [127.0.0.1:3003/dashboard](http://127.0.0.1:3003/dashboard).
 
-The 6 October local website build passed using Next.js 16.3.6. This is not a fresh-machine installation or whole-website lint certification. CI explicitly installs the nested website dependencies and checks security patches, but it does not run a website production build or lint. Do not bypass dependency errors or security checks silently; see [security status](../../SECURITY.md).
-
-The dev server and production start command bind to loopback. Keep this prototype private; approval labels and origin checks are not authentication.
-
-## Dashboard walkthrough
-
-1. Open Overview in Recorded analysis mode.
-2. Open an agent, then one recommendation.
-3. Inspect the evidence, source, risk, manual guidance and history.
-4. Save a plan review or inspect the same item in Approvals. This does not execute the recommendation. Findings open full-page; each agent has Findings, Recommendations, Results and Activity sections.
-5. Use the notification bell to navigate pending work and recorded fallback warnings.
-6. For a synthetic operational slice, open Digital Waste Agent → Open sandbox → Start waste workflow. Select `api-gateway`, review, approve simulation, simulate and check the before/after result. Export evidence. This does not change cloud resources or fleet counts.
-7. For the cache execution slice, open AI Efficiency Agent → Open sandbox and choose Fixture replay. Complete baseline, approval, sandbox application and replay verification; inspect evidence and optional rollback.
-8. Inspect the overview's Resources used by GreenOps summary. Use the header theme controls to switch between sage/lime, Charcoal & Olive, dark, forest and high contrast without changing evidence.
-9. Use Results & Evidence for selected-finding comparisons and JSON export; Agent Activity for curated lifecycle events. These fleet views do not import separate sandbox sessions or CLI operational outcomes.
-
-Sample scenarios is a separate synthetic UI mode. Its counts and estimates are not the CLI run's results. Sample decisions and notification read state reset on reload.
-
-Refresh results only loads saved analysis. After changing provider settings, run a new CLI analysis before refreshing; refreshing never retries inference or starts a scan.
-
-## Operational terminal demos
-
-From the root, these commands run synthetic fixtures without an LLM or cluster:
+For a production preview, stop your own dev server before building:
 
 ```powershell
-pnpm.cmd greenops carbon demo --simulate --ledger ./.tmp/judge-carbon.json
-pnpm.cmd greenops waste demo --simulate --ledger ./.tmp/judge-waste.json
+npm.cmd run build
+npm.cmd run start -- --port 3003
 ```
 
-Both report zero real cloud changes and `savingsVerified: false`. Carbon/Waste accounting is stored in the ledger's `operationalOutcomes`, which the fleet UI does not yet render. The dashboard Waste sandbox has its own server-side session and evidence export. See the README for opt-in public forecasts, read-only Kubernetes inventory and restricted real dispatch prerequisites; none is needed for the judge walkthrough.
+The website scripts compile shared packages first. Root `pnpm.cmd build` does not build the nested website. Do not rebuild into the same output while a preview is running.
 
-## Troubleshooting
+## Google Gemini
 
-| Symptom                                           | What to do                                                                                                                                                                     |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Clone fails or repository returns 404             | Confirm the judge has access to the repository and selected `greenops-init`; do not share credentials                                                                          |
-| `pnpm` missing / PowerShell script blocked        | Install pinned pnpm with `npm.cmd install --global pnpm@11.17.0`; use `.cmd` commands instead of changing execution policy                                                     |
-| Engine or native Tree-sitter installation error   | Check Node version, preserve the lockfiles, inspect the failing install output; a native fallback build may require platform C++ build tools/Python                            |
-| Package-age/security-policy install rejection     | Do not silently disable policy or change dependencies; retain the error and resolve the approved toolchain/registry issue before presenting a clean-install claim              |
-| `EADDRINUSE` on port 3000 (dev) or 3003 (preview) | Stop only your own server with Ctrl+C, or pick another port: `npm.cmd run dev -- --port 3004` / `npm.cmd run start -- --port 3004`                                             |
-| Production start says build missing               | Run `npm.cmd run build` inside the website first; stop your preview before rebuilding                                                                                          |
-| Missing shared agent/ledger module                | Install root dependencies; invoke website `npm.cmd run dev` or `npm.cmd run build`, whose pre-scripts compile shared packages                                                  |
-| Overview has zero findings / wrong dataset        | Generate a fleet ledger, pin `GREENOPS_LEDGER_PATH` in the website terminal, restart the server and open `/dashboard` without an old `run=` query; refresh exits imported mode |
-| Old styles remain                                 | Confirm browser port and source checkout, stop your own preview, build, restart, then reload; changing another running checkout has no effect                                  |
-| Approved but not verified                         | A plan review does not execute anything. Complete the separate cache or Waste sandbox flow; production savings still require measurement                                       |
-| Waste plan/approval expired                       | Start a new scenario, inspect the fresh evidence and reapprove. Plans expire after 15 minutes, simulation approvals after 5 minutes                                            |
-| Carbon/Waste output file already exists           | Use a new filename; evidence outputs intentionally refuse overwrite. Ledgers can append runs, so use fresh ledger filenames for isolated rehearsals                            |
-| Gemini unavailable                                | Use explicit `--provider offline` or Fixture replay. Configure a server-side API key/model for optional live use; a consumer subscription is not an API credential             |
+The deterministic judge path uses `--provider offline`. For model-assisted analysis, place these values in an ignored root `.env.local`:
 
-Never fix an empty dashboard by inventing measured values or removing synthetic/unknown labels. Keep the website on `127.0.0.1`.
+```dotenv
+GREENOPS_LLM_PROVIDER=gemini
+GEMINI_API_KEY=<your private API key>
+GEMINI_MODEL=<model enabled for your API project>
+```
 
-## Validation commands
+The current setup template names `gemini-3.5-flash`; that is configuration, not a promise of API availability. A consumer Gemini subscription is not an API credential. Do not publish keys or use a browser-exposed `NEXT_PUBLIC_` variable.
 
 From the repository root:
 
 ```powershell
-pnpm.cmd version:check
-pnpm.cmd lint
-pnpm.cmd build
-pnpm.cmd test
-pnpm.cmd test:all   # Vitest + MCP Jest suite, as in CI
-
-# Focused dashboard/demo/worksheet regression suite
-.\node_modules\.bin\vitest.cmd run tests/control-plane- tests/dashboard- tests/ai-efficiency-demo-render.test.ts tests/sci-dashboard.test.ts --maxWorkers=4 --reporter=dot
+pnpm.cmd greenops run ./fixtures/azure-baseline --fleet --provider gemini --ledger ./.tmp/azure-baseline-gemini-review.json
 ```
 
-From the website directory:
+Check the investigation records for provider, model, status and usage. A successful CLI exit can still contain rule-based fallback. The last recorded local generation check on 6 October returned HTTP 503; it did not establish a successful live benchmark.
+
+The dashboard also offers **AI Efficiency → Open sandbox → Live Gemini**. This separately requests explicit API-use confirmation. **Assess live readings with Gemini** needs fresh counters from a connected `pnpm.cmd greenops monitor` process; a static Azure fixture does not supply live machine telemetry.
+
+## Connect and sync with MongoDB
+
+Follow the [connected workspace guide](../cloud-dashboard.md) to configure storage and sign in. Select **Connect terminal**, then run this from the repository root:
 
 ```powershell
-npm.cmd run lint
-npm.cmd run build
-# Optional production preview after build
-npm.cmd run start
+pnpm.cmd greenops connect '<URL copied from the dashboard>'
+pnpm.cmd greenops sync --ledger ./.tmp/judge-baseline.json --project greenops-demo
 ```
 
-The list above is the validation procedure, not a claim all commands were rerun in the latest review. See the [current validation record](../SUBMISSION.md#validation-record).
+Paste only the URL inside the quotes, not a second `greenops connect` command. Links are single-use credentials; regenerate expired links and never share them. No global CLI installation is required for these repository-root commands.
 
-## Review workflow and secrets
+MongoDB stores the uploaded evidence; it does not generate findings. The same synthetic ledger can drive both local-file mode and account mode.
 
-Current work targets `greenops-init`; do not assume that it is merged to `main`. Confirm the intended branch before committing or pushing. Use a separate review branch when requested; never force-push or rewrite shared history as part of a documentation update.
+## Extra terminal demos
 
-For every behavior change, update the root README instructions and limitations, this setup guide if commands changed, the architecture boundary if adapters/storage changed, the website README for visible controls, and SUBMISSION.md for dated verification evidence. Keep historical review results dated rather than overwriting them with new claims.
+```powershell
+pnpm.cmd greenops carbon demo --simulate --ledger ./.tmp/judge-carbon.json
+pnpm.cmd greenops waste demo --simulate --ledger ./.tmp/judge-waste.json
+pnpm.cmd greenops run ./fixtures/greenops-sample --provider offline --approve --ledger ./.tmp/judge-code.json
+```
 
-Keep API keys in server-side environment files. Do not commit new .env files, local ledgers, browser exports or private/customer data. The root `.env` is a temporary documented exception; see [SECURITY.md](../../SECURITY.md#data-and-disclosure). Loading the dashboard and running the fixture test suite do not require paid inference.
+Carbon/Waste simulation reports zero real cloud changes. The code-demo approval applies only its supported fix in a temporary sandbox, not the original fixture. Review proposals before entering approval. Full [operational instructions](../operational-workflows.md) cover optional public forecasts and cluster prerequisites.
+
+## Troubleshooting
+
+| Symptom                              | Check                                                                                                     |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| Repository unavailable               | Confirm access and the exact submitted branch/commit; do not share credentials                            |
+| `greenops` not recognized            | Return to the repository root and use `pnpm.cmd greenops`                                                 |
+| PowerShell script blocked            | Use `pnpm.cmd` / `npm.cmd`, not a weaker execution policy                                                 |
+| Native parser installation fails     | Check Node version and install output; a fallback native build may need C++ tools/Python                  |
+| Dependency/security-policy rejection | Keep lockfiles and guards; resolve the specific installation issue rather than disabling policy           |
+| Port 3003 already used               | Stop your own server with Ctrl+C, or use `--port 3004`                                                    |
+| Storage unavailable at login         | Check private MongoDB URI, credentials, Atlas network access and database permissions                     |
+| No data after login                  | Connect the CLI and sync the ledger to that account; a local file is not automatically uploaded           |
+| Empty local dashboard                | Check the pinned ledger path and remove a stale `run=` parameter; reload the intended dataset             |
+| Date filter looks unchanged          | Same-day findings fit several presets; use Custom dates or Sample scenarios to exercise different windows |
+| Plan approved but not applied        | Normal approval records a decision only; use the separate supported sandbox to demonstrate application    |
+| Old UI after editing                 | Check the port and checkout; restart your own server and reload                                           |
+| Gemini fails                         | Inspect recorded fallback/error; use offline or Fixture replay for a no-key demonstration                 |
+| Waste plan/decision expired          | Start a fresh scenario and review its new evidence                                                        |
+| Output file already exists           | Use a fresh evidence-output filename; do not overwrite a previous result                                  |
+
+## Validation commands
+
+From the repository root, after both dependency installations:
+
+```powershell
+pnpm.cmd build
+pnpm.cmd test:all
+pnpm.cmd version:check
+pnpm.cmd exec vitest run tests/control-plane-dashboard.test.ts tests/control-plane-data.test.ts tests/dashboard-approval-render.test.ts tests/carbon-atlas-data.test.ts
+```
+
+From the website directory: `npm.cmd run lint` and `npm.cmd run build`.
+
+These are procedures, not a claim they all passed today. See [dated results](../SUBMISSION.md#validation-record). MongoDB integration tests are opt-in and use a disposable database, not Atlas; one CLI file-permission assertion is currently platform-sensitive on Windows.
+
+## Working agreement
+
+Make changes on a local review branch. Push only after explicit approval to the intended remote branch; do not assume old `greenops-init` workflow triggers apply to `develop`. Do not rewrite shared history.
+
+Update the relevant guide when behavior changes. Keep the README short; put technical detail here, in architecture, or in a focused reference. Record only checks actually performed.

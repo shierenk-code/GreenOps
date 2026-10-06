@@ -25,7 +25,8 @@ export type ControlTab =
 export type DataMode = 'recorded' | 'sample';
 export type ThemeName = 'sunset' | 'clean' | 'olive' | 'dark' | 'forest' | 'highContrast';
 export type EnvironmentFilter = 'All' | 'Prod' | 'Staging';
-export type TimeRange = '24h' | '7d' | '30d' | '1y';
+export type TimeRange = '24h' | '7d' | '30d' | '1y' | 'custom';
+export interface DateWindow { from: string; to: string }
 export type Tone = 'green' | 'blue' | 'amber' | 'purple' | 'rose' | 'neutral';
 export interface Fact {
   label: string;

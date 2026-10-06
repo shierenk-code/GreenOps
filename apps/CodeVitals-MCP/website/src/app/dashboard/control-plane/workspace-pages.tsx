@@ -9,7 +9,6 @@ import { filterOpportunities, LedgerPage } from './audit-pages';
 import { Chart, Empty, MetricGrid, StatusBadge } from './ui';
 import { CarbonAtlas } from './carbon-atlas';
 import { ResourceSummary } from './resource-summary';
-import { EvidenceComparison } from './evidence-comparison';
 import DemoClient from '../ai-efficiency-demo/demo-client';
 import WasteWorkflowClient from '../digital-waste/workflow-client';
 import styles from './workspace-pages.module.css';
@@ -32,10 +31,13 @@ export function FindingList({
   onReview,
   recommendations = false,
   initialQuery = '',
-}: PageProps & { recommendations?: boolean; initialQuery?: string }) {
+  compact = false,
+}: PageProps & { recommendations?: boolean; initialQuery?: string; compact?: boolean }) {
   const [query, setQuery] = useState(initialQuery);
   const [status, setStatus] = useState('all');
+  const [showAll, setShowAll] = useState(false);
   const shown = filterOpportunities(data.opportunities, query, status);
+  const visible = compact && !showAll && !query && status === 'all' ? shown.slice(0, 3) : shown;
   return (
     <section
       className={styles.card}
@@ -68,7 +70,7 @@ export function FindingList({
         </select>
       </div>
       <p className={styles.caption}>
-        {shown.length} of {data.opportunities.length} findings ·{' '}
+        {visible.length} of {data.opportunities.length} findings ·{' '}
         {data.mode === 'sample' ? 'Synthetic examples' : 'Selected analysis'}
       </p>
       {!shown.length ? (
@@ -88,7 +90,7 @@ export function FindingList({
               </tr>
             </thead>
             <tbody>
-              {shown.map((item) => (
+              {visible.map((item) => (
                 <tr key={item.id}>
                   <th scope="row">
                     {item.target}
@@ -96,7 +98,7 @@ export function FindingList({
                   </th>
                   <td>
                     <strong>{item.title}</strong>
-                    <p>{recommendations ? item.recommendation : item.description}</p>
+                    {!compact && <p>{recommendations ? item.recommendation : item.description}</p>}
                   </td>
                   <td>
                     <StatusBadge status={item.status} />
@@ -118,6 +120,12 @@ export function FindingList({
             </tbody>
           </table>
         </div>
+      )}
+      {compact && shown.length > 3 && !query && status === 'all' && (
+        <button className={styles.textButton} onClick={() => setShowAll(!showAll)}>
+          {showAll ? 'Show fewer findings' : `View all ${shown.length} findings`}{' '}
+          <ArrowRight size={14} aria-hidden="true" />
+        </button>
       )}
     </section>
   );
@@ -286,6 +294,10 @@ export function SpecialistWorkspace({
     ),
   };
   const next = opportunities.find(isPending);
+  const attentionFirst = [
+    ...opportunities.filter(isPending),
+    ...opportunities.filter((item) => !isPending(item)),
+  ];
   const supportsSandbox = ['ai', 'waste'].includes(agent.key);
   return (
     <section className={styles.page} aria-label={`${TAB_LABELS[agent.key]} workspace`}>
@@ -307,20 +319,32 @@ export function SpecialistWorkspace({
       </header>
       <div className={styles.summary}>
         <article>
+          <span>Resources with findings</span>
+          <strong>{new Set(opportunities.map((item) => item.target)).size}</strong>
+          <small>In this selection</small>
+        </article>
+        <article>
           <span>Findings</span>
           <strong>{opportunities.length}</strong>
+          <small>Detected opportunities</small>
         </article>
         <article>
           <span>Awaiting review</span>
           <strong>{opportunities.filter(isPending).length}</strong>
+          <small>Human decision needed</small>
         </article>
         <article>
-          <span>Risk not assessed</span>
-          <strong>{opportunities.filter((o) => o.risk === 'Unknown').length}</strong>
-        </article>
-        <article>
-          <span>Production savings</span>
-          <strong className={styles.unknown}>Not measured</strong>
+          <span>Change checks passed</span>
+          <strong>
+            {data.mode === 'sample'
+              ? 0
+              : opportunities.filter((item) => item.status === 'verified').length}
+          </strong>
+          <small>
+            {data.mode === 'sample'
+              ? 'Synthetic examples · not verified'
+              : 'Not proof of measured carbon savings'}
+          </small>
         </article>
       </div>
       {!sandbox && (agent.key === 'carbon' || agent.key === 'arch') && (
@@ -354,58 +378,48 @@ export function SpecialistWorkspace({
       ) : (
         <>
           <div className={styles.columns}>
-            <FindingList
-              key={`${agent.key}-${section}`}
-              data={scoped}
-              onReview={onReview}
-              recommendations={section === 'recommendations'}
-            />
-            <aside className={styles.aside}>
-              {next && <EvidenceComparison item={next} />}
+            {agent.chart ? (
+              <Chart data={agent.chart} kind="bar" />
+            ) : (
               <section className={styles.card}>
-                <h3>{next ? `Start with ${next.target}` : 'Review complete for this selection'}</h3>
+                <h3>Workload comparison</h3>
+                <Empty>
+                  No comparable measurements in this selection. Review the findings below.
+                </Empty>
+              </section>
+            )}
+            <aside className={styles.aside}>
+              <section className={styles.card}>
+                <span className={styles.eyebrow}>Your next step</span>
+                <h3>{next ? next.target : 'No pending decisions'}</h3>
                 <p>
-                  {next?.description ??
+                  {next?.title ??
                     'Reviewed plans still need separate implementation and follow-up evidence.'}
                 </p>
                 {next && (
                   <>
-                    <dl>
-                      <div>
-                        <dt>Recommendation</dt>
-                        <dd>{next.title}</dd>
-                      </div>
-                      <div>
-                        <dt>Risk</dt>
-                        <dd>{next.risk === 'Unknown' ? 'Not assessed' : next.risk}</dd>
-                      </div>
-                      <div>
-                        <dt>Execution</dt>
-                        <dd>Plan review only</dd>
-                      </div>
-                    </dl>
+                    <p className={styles.caption}>
+                      {next.risk === 'Unknown' ? 'Risk not assessed' : `${next.risk} risk`} · Plan
+                      review only
+                    </p>
                     <button className={styles.button} onClick={() => onReview(next.id)}>
                       Review recommendation <ArrowRight size={16} aria-hidden="true" />
                     </button>
                   </>
                 )}
               </section>
-              <section className={styles.card}>
-                <ShieldCheck size={23} aria-hidden="true" />
-                <h3>Before making a change</h3>
-                <p>
-                  Confirm resource ownership, operating constraints and rollback. Missing evidence
-                  is not permission to proceed.
-                </p>
-              </section>
             </aside>
           </div>
-          <div className={styles.domainInsights}>
-            <MetricGrid metrics={agent.metrics} />
-            {agent.chart && <Chart data={agent.chart} kind="bar" />}
-          </div>
+          <FindingList
+            key={`${agent.key}-${section}`}
+            data={{ ...scoped, opportunities: attentionFirst }}
+            onReview={onReview}
+            recommendations={section === 'recommendations'}
+            compact
+          />
           <details className={styles.card}>
             <summary>Domain measurements & source inventory</summary>
+            <MetricGrid metrics={agent.metrics} />
             <div className={styles.tableScroll}>
               <table>
                 <caption>{agent.inventoryTitle}</caption>

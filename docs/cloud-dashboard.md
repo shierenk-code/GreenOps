@@ -1,4 +1,6 @@
-# GreenOps accounts, terminal sync and Azure hosting
+# Connected workspace: MongoDB, terminal sync and optional hosting
+
+For the no-database judge walkthrough, use the [README](../README.md#quick-start). This is the optional account-connected path; MongoDB is not required to view bundled sample results.
 
 The website serves the frontend and authenticated API together. MongoDB Atlas stores accounts,
 hashed sessions, single-use terminal links, run snapshots and account review decisions.
@@ -11,7 +13,7 @@ Keep secrets in ignored `apps/CodeVitals-MCP/website/.env.local`:
 ```dotenv
 MONGODB_URI=<your rotated Atlas connection string>
 MONGODB_DB=greenops
-GREENOPS_PUBLIC_URL=http://127.0.0.1:3016
+GREENOPS_PUBLIC_URL=http://127.0.0.1:3003
 GREENOPS_REGISTRATION=open
 ```
 
@@ -20,12 +22,21 @@ Allow your development IP in Atlas Network Access, then run:
 ```sh
 cd apps/CodeVitals-MCP/website
 npm ci
-npm run dev -- --port 3016
+npm run dev -- --port 3003
 ```
 
-Visit `http://127.0.0.1:3016/login`, create an account, and choose **Connect terminal**.
+Visit `http://127.0.0.1:3003/login`, create an account, and choose **Connect terminal**.
 The private link expires after ten minutes
 and works only once. It contains a login credential: do not share it or commit it.
+
+On Windows, from the GreenOps repository root (no global installation required):
+
+```powershell
+pnpm.cmd greenops connect '<URL only, copied from the dashboard>'
+pnpm.cmd greenops sync --ledger ./.tmp/judge-baseline.json --project greenops-demo
+```
+
+Generate that ledger using the README first. The same synthetic JSON works in local-file and MongoDB modes; creating an account does not generate data. Paste only the link, not another command, inside the quotes. Account mode loads uploaded records, not `GREENOPS_LEDGER_PATH`.
 
 ## Use GreenOps in any codebase
 
@@ -110,7 +121,7 @@ heartbeats are shown as offline after one minute.
 
 The **Build GreenOps web deployment** GitHub workflow builds a Linux standalone Next.js package,
 runs MongoDB integration tests, and uploads `greenops-web-linux`. It does not deploy automatically.
-After this code is pushed, run it on the intended branch (or use its push-triggered run).
+Run it manually on the intended branch. Its current automatic push trigger targets `greenops-init`, not `develop`; confirm branch coverage before relying on automation.
 Download the artifact and extract its outer archive to obtain `greenops-web.zip`.
 
 With Azure CLI installed and signed into the correct subscription:
@@ -192,7 +203,7 @@ token, the local pin is visible but its intensity is unavailable. This location 
 an operator configuration shared by this deployment; it is not automatic device
 geolocation. Public grid context is never added to measured machine emissions.
 
-The six specialist views show evidence actually collected. Repository review feeds
+The seven specialist views show evidence actually collected. Repository review feeds
 Architecture, recorded model requests feed usage metrics, and available grid data
 feeds public context. Cloud waste needs resource inventory, disaster recovery needs
 recovery-test evidence, and collaboration needs workflow evidence; neither mock

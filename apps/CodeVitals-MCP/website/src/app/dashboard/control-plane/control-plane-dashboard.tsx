@@ -33,7 +33,6 @@ import {
   Search,
   Menu,
   X,
-  Palette,
   ArrowUpRight,
   PanelLeftClose,
   Workflow,
@@ -43,7 +42,7 @@ import { selectDashboardRun } from '../dashboard-run';
 import type { DashboardView } from '../ledger-dashboard';
 import { useApprovalDecisions } from '../approval-inbox';
 import { latestProposalDecision, type ApprovalInput } from '../approval-decisions';
-import { buildRecordedData, buildSampleData, findingsFromRun } from './data';
+import { buildRecordedData, buildSampleData, findingsFromRun, validDateWindow } from './data';
 import {
   SpecialistWorkspace,
   InvestigationPage,
@@ -144,10 +143,8 @@ export default function ControlPlaneDashboard({
   const router = useRouter();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const mobileToggle = useRef<HTMLButtonElement>(null);
   const mobileCloseRef = useRef<HTMLButtonElement>(null);
-  const appearanceRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!mobileOpen) return;
     mobileCloseRef.current?.focus();
@@ -163,22 +160,6 @@ export default function ControlPlaneDashboard({
       document.body.style.overflow = previousOverflow;
     };
   }, [mobileOpen]);
-  useEffect(() => {
-    if (!themeMenuOpen) return;
-    const closeWhenLeaving = (event: PointerEvent) => {
-      if (event.target instanceof Node && !appearanceRef.current?.contains(event.target))
-        setThemeMenuOpen(false);
-    };
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setThemeMenuOpen(false);
-    };
-    document.addEventListener('pointerdown', closeWhenLeaving);
-    document.addEventListener('keydown', closeOnEscape);
-    return () => {
-      document.removeEventListener('pointerdown', closeWhenLeaving);
-      document.removeEventListener('keydown', closeOnEscape);
-    };
-  }, [themeMenuOpen]);
   const pathname = usePathname();
   const search = useSearchParams();
   const query = search.toString();
@@ -189,9 +170,12 @@ export default function ControlPlaneDashboard({
   const theme: ThemeName = THEMES.some((t) => t.id === search.get('theme'))
     ? (search.get('theme') as ThemeName)
     : 'sunset';
-  const timeRange: TimeRange = ['24h', '7d', '30d', '1y'].includes(search.get('range') ?? '')
+  const timeRange: TimeRange = ['24h', '7d', '30d', '1y', 'custom'].includes(search.get('range') ?? '')
     ? (search.get('range') as TimeRange)
     : '30d';
+  const dateFrom = search.get('from') ?? '';
+  const dateTo = search.get('to') ?? '';
+  const dateWindow = useMemo(() => ({ from: dateFrom, to: dateTo }), [dateFrom, dateTo]);
   const section: WorkspaceSection = WORKSPACE_SECTIONS.includes(
     search.get('section') as WorkspaceSection,
   )
@@ -212,19 +196,22 @@ export default function ControlPlaneDashboard({
   }, [cached]);
   const [loaded, setLoaded] = useState<{ ledger: LedgerFile; fileName: string } | null>(null);
   const ledger = cloud ? initialLedger : (loaded?.ledger ?? uploaded?.ledger ?? initialLedger);
+  // Keep review bindings stable when server polling returns unchanged evidence as new objects.
+  const ledgerContent = JSON.stringify(ledger);
+  const stableLedger = useMemo(() => JSON.parse(ledgerContent) as LedgerFile | null, [ledgerContent]);
   const fileName = cloud
     ? initialFileName
     : (loaded?.fileName ?? uploaded?.fileName ?? initialFileName);
   const requestedRun = search.get('run');
-  const run = useMemo(() => selectDashboardRun(ledger, requestedRun), [ledger, requestedRun]);
+  const run = useMemo(() => selectDashboardRun(stableLedger, requestedRun), [stableLedger, requestedRun]);
   const findings = useMemo(() => findingsFromRun(run), [run]);
   const approvalStore = useApprovalDecisions(run, findings);
   const base = useMemo(
     () =>
       mode === 'sample'
-        ? buildSampleData('All', timeRange)
-        : buildRecordedData(run, findings, 'All', timeRange),
-    [mode, run, findings, timeRange],
+        ? buildSampleData('All', timeRange, dateWindow)
+        : buildRecordedData(run, findings, 'All', timeRange, dateWindow),
+    [mode, run, findings, timeRange, dateWindow],
   );
   const [sampleDecisions, setSampleDecisions] = useState<
     Array<{ id: string; input: ApprovalInput; at: string }>
@@ -398,7 +385,11 @@ export default function ControlPlaneDashboard({
     window.history.pushState(null, '', `${pathname}?${href(activeTab).split('?')[1]}`);
   }
   async function saveDecision(id: string, input: ApprovalInput) {
-    if (mode === 'recorded') return approvalStore.save(id, input);
+    if (mode === 'recorded') {
+      const result = await approvalStore.save(id, input);
+      if (result.ok) setNotice(result.message);
+      return result;
+    }
     if (!data.opportunities.some((op) => op.id === id))
       return { ok: false, message: 'This sample proposal is no longer in the selected view.' };
     if (
@@ -422,6 +413,7 @@ export default function ControlPlaneDashboard({
         at: new Date().toISOString(),
       },
     ]);
+    setNotice('Simulated decision saved for this session. Open the apply & verify demo to test a change.');
     return {
       ok: true,
       message:
@@ -778,55 +770,30 @@ export default function ControlPlaneDashboard({
             <select
               aria-label="Analysis time range"
               value={timeRange}
-              onChange={(event) => update({ range: event.target.value })}
+              onChange={(event) => {
+                if (event.target.value === 'custom') {
+                  const end = base.asOf?.slice(0, 10) || new Date().toISOString().slice(0, 10);
+                  update({ range: 'custom', from: dateFrom || end, to: dateTo || end });
+                } else update({ range: event.target.value, from: null, to: null });
+              }}
             >
               <option value="24h">Last 24 Hours</option>
               <option value="7d">Last 7 Days</option>
               <option value="30d">Last 30 Days</option>
               <option value="1y">Last Year</option>
+              <option value="custom">Custom dates</option>
             </select>
-            <div className={styles.appearance} ref={appearanceRef}>
-              <button
-                className={styles.appearanceButton}
-                type="button"
-                aria-label="Choose appearance"
-                title="Choose appearance"
-                aria-expanded={themeMenuOpen}
-                aria-haspopup="menu"
-                onClick={() => setThemeMenuOpen((open) => !open)}
-              >
-                <Palette size={18} aria-hidden="true" />
-              </button>
-              <div
-                className={styles.themePopover}
-                role="menu"
-                aria-label="Dashboard theme"
-                hidden={!themeMenuOpen}
-              >
-                <div className={styles.themes} role="group" aria-label="Dashboard theme">
-                  {THEMES.map((option) => {
-                    const Icon = option.icon;
-                    return (
-                      <button
-                        key={option.id}
-                        type="button"
-                        title={option.name}
-                        aria-label={option.name}
-                        aria-pressed={theme === option.id}
-                        role="menuitemradio"
-                        aria-checked={theme === option.id}
-                        onClick={() => {
-                          update({ theme: option.id === 'sunset' ? null : option.id });
-                          setThemeMenuOpen(false);
-                        }}
-                      >
-                        <Icon size={16} aria-hidden="true" />
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
+            {timeRange === 'custom' && (
+              <form key={`${dateFrom}-${dateTo}`} className={styles.dateWindow} onSubmit={(event) => {
+                event.preventDefault();
+                const form = new FormData(event.currentTarget);
+                update({ from: String(form.get('from') || ''), to: String(form.get('to') || '') });
+              }}>
+                <label>From <input type="date" name="from" aria-label="Finding date from" defaultValue={dateFrom} required /></label>
+                <label>To <input type="date" name="to" aria-label="Finding date to" defaultValue={dateTo} required /></label>
+                <button type="submit" className={styles.textButton}>Apply dates</button>
+              </form>
+            )}
             <Notifications
               items={notifications}
               href={(item) => href(item.tab, item.findingId ? { finding: item.findingId } : {})}
@@ -886,6 +853,16 @@ export default function ControlPlaneDashboard({
               }}
             />
           </div>
+        </div>
+        <div className={styles.datasetBar} role="status">
+          <span>
+            {timeRange === 'custom' && !validDateWindow(dateWindow)
+              ? 'Choose valid start and end dates, with the start before or on the end date.'
+              : `${base.opportunities.length} findings in this date window · ${timeRange === 'custom' ? `${dateFrom} to ${dateTo} (UTC)` : `relative to the ${base.asOf?.slice(0, 10) || 'selected'} snapshot`}.`}
+            {mode === 'recorded' && findings.length > 0 && new Set(findings.map((finding) => finding.entries.find((entry) => entry.stage === 'detect')?.timestamp?.slice(0, 10))).size === 1
+              ? ' All findings in this run were detected on the same day; presets can show identical results.' : ''}
+            {' Run totals and subscription baseline keep their original measurement period.'}
+          </span>
         </div>
         <main className={styles.main} id="control-plane-content" tabIndex={-1}>
           {error && (

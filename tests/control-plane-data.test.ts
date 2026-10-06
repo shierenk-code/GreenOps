@@ -218,6 +218,25 @@ describe('control-plane recorded data adapter', () => {
     ).toEqual(['recent', 'week', 'old']);
   });
 
+  it('includes both UTC boundary dates in custom windows and rejects invalid windows', () => {
+    const selectedRun = run([
+      detection('start', undefined, '2026-10-01T00:00:00Z'),
+      detection('end', undefined, '2026-10-02T23:59:59Z'),
+      detection('outside', undefined, '2026-10-03T00:00:00Z'),
+    ]);
+    const findings = findingsFromRun(selectedRun);
+    expect(buildRecordedData(selectedRun, findings, 'All', 'custom', {
+      from: '2026-10-01', to: '2026-10-02',
+    }).opportunities.map(item => item.id)).toEqual(['start', 'end']);
+    for (const window of [
+      { from: '2026-10-03', to: '2026-10-01' },
+      { from: '', to: '2026-10-01' },
+      { from: '2026-02-30', to: '2026-10-01' },
+    ]) expect(buildRecordedData(selectedRun, findings, 'All', 'custom', window).opportunities).toEqual([]);
+    expect(buildSampleData('All', 'custom', { from: '2025-01-01', to: '2025-01-02' }).opportunities).toEqual([]);
+    expect(buildSampleData('All', 'custom', { from: '2026-01-01', to: '2026-10-04' }).opportunities.length).toBeGreaterThan(0);
+  });
+
   it('rebuilds stale caller fields from the matching run', () => {
     const selectedRun = run([detection()]);
     const findings = findingsFromRun(selectedRun);

@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './cloud.module.css';
 const CloudContext = createContext(false);
 export const useCloud = () => useContext(CloudContext);
+const CloudIdentityContext = createContext<string | null>(null);
+export const useCloudIdentity = () => useContext(CloudIdentityContext);
 let refreshing: Promise<Response> | undefined;
 export async function cloudFetch(path: string, options: RequestInit = {}) {
   const send = () =>
@@ -90,6 +92,7 @@ export function CloudWorkspace({ email, children }: { email: string; children: R
   }
   return (
     <CloudContext.Provider value={true}>
+      <CloudIdentityContext.Provider value={email}>
       <section className={styles.account} aria-label="Connected account">
         <div className={styles.bar}>
           <strong>{email}</strong>
@@ -184,6 +187,7 @@ export function CloudWorkspace({ email, children }: { email: string; children: R
         </details>
       </section>
       {children}
+      </CloudIdentityContext.Provider>
     </CloudContext.Provider>
   );
 }

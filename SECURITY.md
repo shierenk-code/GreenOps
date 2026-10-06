@@ -22,8 +22,8 @@ If a credential has been exposed, revoke/rotate it through the relevant provider
 ## Prototype trust boundaries
 
 - The dashboard and isolated AI demo are intended for loopback-only local use. Do not publish them through a tunnel or shared network binding without authentication, authorization, protected durable storage and rate controls.
-- Human Approvals records browser-local plan reviews. Reviewer names are self-declared; records are not authenticated, shared or tamper-proof and do not authorize cloud execution.
-- Model credentials remain server-side in environment files (see the temporary root `.env` exception below). Do not use browser-exposed environment variables for secrets.
+- Human Approvals records plan reviews only. No-database reviews are browser-local with self-declared identity; MongoDB reviews are account-scoped and use the signed-in identity. Neither authorizes cloud execution. Separate sandbox reviewer labels remain self-declared.
+- Model credentials remain server-side in ignored environment files. Do not use browser-exposed environment variables for secrets.
 - Imported ledgers and model output are untrusted input. Preserve validation, file-size limits, safe rendering and evidence allowlists.
 - The isolated cache demo uses built-in synthetic prompts and version-bound actions. Fixture mode requires no paid inference; live mode is an explicit opt-in.
 - The GitHub webhook service is a separate network service, not the dashboard. Configure a webhook secret and appropriately scoped credentials before connecting it. Requests are rejected when the secret is missing or the signature is invalid; still do not expose the listener without scoped credentials and network restrictions.
@@ -54,6 +54,6 @@ Validation after the recursion mitigation (5 October 2026): **954 root tests**, 
 
 Use public, open or synthetic demonstration data. Keep .env files, local result ledgers, session records and exported evidence out of commits. Review staged files before pushing.
 
-**Temporary exception:** the root `.env` (Gemini settings) is currently committed to this private repository during development. Treat its key as exposed to everyone with repository access. Before sharing access more widely or making the repository public, rotate the key, then remove the file with `git rm --cached .env` (it stays ignored by `.gitignore`). Removing it does not erase it from Git history; rotation is the only real fix.
+The current checkout does not track root `.env` or `.env.local`. Keep it that way. Any credential previously shared in chat or Git history must be treated as exposed and rotated; removing a file or creating a new branch does not revoke a credential. No credential rotation is implied by this documentation update.
 
-See [architecture](docs/architecture/overview.md) and [submission status](docs/SUBMISSION.md) for current limits. Security reports and remediation changes should be reviewed before merging into greenops-init.
+See [architecture](docs/architecture/overview.md) and [submission status](docs/SUBMISSION.md) for current limits. Review security changes on a local feature branch before merging into the intended submission branch.

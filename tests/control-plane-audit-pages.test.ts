@@ -250,6 +250,12 @@ describe('reference dashboard human review dialog', () => {
     expect(html).toMatch(/<input(?=[^>]*name="reviewer")(?=[^>]*required="")[^>]*>/);
     expect(html).toMatch(/name="reason" required=""/);
     expect(html).toMatch(/type="checkbox"[^>]*required=""/);
+    // Saving belongs with the fields, not below unrelated demo/history panels.
+    expect(html.indexOf('Record decision')).toBeGreaterThan(html.indexOf('scope-acknowledgment'));
+    expect(html.indexOf('Record decision')).toBeLessThan(
+      html.indexOf('Try applying a change in the prototype'),
+    );
+    expect((html.match(/type="submit"/g) ?? []).length).toBe(1);
   });
 
   it('fails closed if safe storage is unavailable', () => {

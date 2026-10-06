@@ -22,7 +22,20 @@ export function CarbonAtlas({
   const [selection, setSelection] = useState('');
   const [layer, setLayer] = useState<'intensity' | 'findings'>('intensity');
   const [zoom, setZoom] = useState(1);
-  const [showRoutes, setShowRoutes] = useState(true);
+  const [showRoutes, setShowRoutes] = useState(false);
+  const rankedRegions = regions
+    .map((region) => {
+      const items = observations.filter((item) => item.region.id === region.id);
+      const values = items.flatMap((item) => (item.intensity === null ? [] : [item.intensity]));
+      return {
+        region,
+        maximum: values.length ? Math.max(...values) : null,
+        count: new Set(items.map((item) => item.findingId)).size,
+      };
+    })
+    .sort((a, b) =>
+      layer === 'findings' ? b.count - a.count : (b.maximum ?? -1) - (a.maximum ?? -1),
+    );
   const routes = observations
     .filter((o) => o.kind === 'Current')
     .flatMap((current) => {
@@ -49,8 +62,10 @@ export function CarbonAtlas({
           <p className={styles.eyebrow}>
             <Globe2 size={14} aria-hidden="true" /> THE BIGGER PICTURE
           </p>
-          <h3 id={`${id}-title`}>A world of better choices.</h3>
-          <p>Explore the geography behind your carbon decisions.</p>
+          <h3 id={`${id}-title`}>Carbon by region</h3>
+          <p>
+            Select a region to see its resources. Grid intensity is not total workload emissions.
+          </p>
         </div>
         <span className={styles.sourceBadge}>
           {data.mode === 'sample' ? 'Synthetic scenarios' : 'Recorded observations'} · not live
@@ -140,6 +155,9 @@ export function CarbonAtlas({
                     onClick={() => setSelection(region.id)}
                   >
                     <span>{layer === 'findings' ? count : <span className={styles.pinDot} />}</span>
+                    {active?.id === region.id && (
+                      <small className={styles.pinLabel}>{region.name}</small>
+                    )}
                   </button>
                 );
               })}
@@ -206,6 +224,31 @@ export function CarbonAtlas({
           </div>
         </div>
         <aside className={styles.detail}>
+          <div className={styles.ranking}>
+            <h4>
+              {layer === 'intensity'
+                ? 'Highest observed grid intensity'
+                : 'Regions by finding count'}
+            </h4>
+            {rankedRegions.map(({ region, maximum, count }) => (
+              <button
+                type="button"
+                key={region.id}
+                aria-pressed={active?.id === region.id}
+                onClick={() => setSelection(region.id)}
+              >
+                <span>{region.name}</span>
+                <strong>
+                  {layer === 'findings' ? count : maximum === null ? 'Unknown' : `${maximum} g`}
+                </strong>
+              </button>
+            ))}
+            <small>
+              {layer === 'intensity'
+                ? `g CO₂e/kWh · ${data.mode === 'sample' ? 'synthetic scenarios' : 'recorded observations'}`
+                : 'Distinct findings; regions can overlap'}
+            </small>
+          </div>
           <label htmlFor={`${id}-region`}>REGIONAL EXPLORER</label>
           <select
             id={`${id}-region`}

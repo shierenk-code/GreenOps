@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Activity, Globe2, Bot } from 'lucide-react';
 import { cloudFetch, useCloud } from '../../cloud-client';
@@ -116,6 +117,13 @@ export function LiveWorkspace() {
   const live = last && now - Date.parse(last.receivedAt) < 30000 && !error;
   const selected = points.find((p) => p.id === region) || points[0];
   async function explain() {
+    if (busy) return;
+    if (!last || Date.now() - Date.parse(last.receivedAt) >= 120000 || error) {
+      setAssessment(
+        'No recent computer readings are available. Run pnpm.cmd greenops monitor from your linked GreenOps repository and leave that terminal running. To test Gemini with synthetic data instead, open the AI Efficiency demo below.',
+      );
+      return;
+    }
     setBusy(true);
     setAssessment('');
     try {
@@ -128,7 +136,7 @@ export function LiveWorkspace() {
       setAssessment(
         response.ok
           ? `${result.model} · ${new Date(result.generatedAt).toLocaleTimeString()}\n${result.explanation}`
-          : result.error,
+          : result.error || 'Gemini could not complete the assessment. Please try again.',
       );
     } catch {
       setAssessment('Assessment unavailable. Retry shortly.');
@@ -201,14 +209,18 @@ export function LiveWorkspace() {
             CPU and memory do not measure electricity or emissions. A power meter or supported
             hardware sensor is needed for measured energy.
           </p>
-          <button disabled={!live || busy} onClick={() => void explain()}>
+          <button disabled={busy} aria-describedby="gemini-live-help" onClick={() => void explain()}>
             <Bot size={16} />
             {busy ? 'Gemini is assessing…' : 'Assess live readings with Gemini'}
           </button>
-          <small>
-            Sends recent utilization counters and public grid values to your configured Gemini
-            model.
+          <small id="gemini-live-help">
+            {!live
+              ? 'Waiting for fresh computer readings. Saved Azure mock findings do not provide live computer readings. Run pnpm.cmd greenops monitor in your linked repository and keep the terminal open.'
+              : 'Sends recent utilization counters and public grid values to your configured Gemini model.'}
           </small>
+          <p>
+            <Link href="/dashboard/ai-efficiency-demo">Test Gemini with synthetic data →</Link>
+          </p>
           {assessment && (
             <div className={styles.assessment} role="status">
               {assessment}

@@ -1,5 +1,6 @@
 'use client';
-import { useCloud } from '../../cloud-client';
+import { useCloud, useCloudIdentity } from '../../cloud-client';
+import Link from 'next/link';
 
 import { Fragment, useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import type { LocalDecision } from '../approval-decisions';
@@ -155,7 +156,9 @@ export function ApprovalPage({ data, onReview }: ReviewProps) {
       <Callout title="Human-in-the-loop safety queue" tone="green">
         {data.mode === 'sample'
           ? 'Explore synthetic proposals and simulate a review. Sample decisions stay in this session and never change your recorded runs or infrastructure.'
-          : cloud ? 'Review evidence, projected impact and risk. Decisions are stored in your account with your signed-in identity. Approving a plan does not deploy or verify a change.' : 'Your agents propose the improvements. You review the evidence, projected impact, and risk before making a decision. Approvals record a plan locally; they do not deploy or verify a change.'}
+          : cloud
+            ? 'Review evidence, projected impact and risk. Decisions are stored in your account with your signed-in identity. Approving a plan does not deploy or verify a change.'
+            : 'Your agents propose the improvements. You review the evidence, projected impact, and risk before making a decision. Approvals record a plan locally; they do not deploy or verify a change.'}
       </Callout>
       <div className={styles.heading}>
         <div>
@@ -523,6 +526,7 @@ function ReviewDialogContent({
 }: ReviewDialogProps & { opportunity: Opportunity }) {
   const cloud = useCloud();
   const dialog = useRef<HTMLDialogElement>(null);
+  const signedInEmail = useCloudIdentity();
   const heading = useRef<HTMLHeadingElement>(null);
   const titleId = useId();
   const descriptionId = useId();
@@ -531,7 +535,8 @@ function ReviewDialogContent({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [decision, setDecision] = useState<LocalDecision | ''>('');
-  const [reviewer, setReviewer] = useState(cloud ? 'Authenticated account' : '');
+  const [reviewer, setReviewer] = useState('');
+  const reviewerName = cloud ? signedInEmail || 'Signed-in account' : reviewer;
   const [reason, setReason] = useState('');
   const [acknowledged, setAcknowledged] = useState(false);
   const [revising, setRevising] = useState(false);
@@ -576,10 +581,14 @@ function ReviewDialogContent({
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (pendingRef.current || !canSave || completed || (reviewed && !revising)) return;
-    const input = { decision, reviewer: reviewer.trim(), reason: reason.trim(), acknowledged };
+    const input = { decision, reviewer: reviewerName.trim(), reason: reason.trim(), acknowledged };
     const validation = validateReviewInput(input);
     if (validation) {
       setError(validation);
+      return;
+    }
+    if (mode === 'sample' && input.reason.length < 8) {
+      setError('Add a decision reason of at least 8 characters.');
       return;
     }
     pendingRef.current = true;
@@ -780,62 +789,95 @@ function ReviewDialogContent({
               </button>
             </section>
           ) : (
-            <fieldset className={styles.decisionFields} disabled={pending || !canSave}>
-              <legend>Your decision</legend>
-              <label>
-                Decision
-                <select
-                  value={decision}
-                  onChange={(event) => setDecision(event.target.value as LocalDecision | '')}
-                  required
-                  name="decision"
-                >
-                  <option value="">Choose a decision</option>
-                  <option value="approved">Approve plan only</option>
-                  <option value="rejected">Reject plan</option>
-                  <option value="revision-requested">Request revision</option>
-                </select>
-              </label>
-              <label>
-                Reviewer <span>{cloud ? '(signed-in account)' : '(self-declared)'}</span>
-                <input
-                  name="reviewer"
-                  readOnly={cloud}
-                  autoComplete="name"
-                  required
-                  maxLength={100}
-                  value={reviewer}
-                  onChange={(event) => setReviewer(event.target.value)}
-                  placeholder="Your name"
-                />
-              </label>
-              <label className={styles.reasonField}>
-                Decision reason
-                <textarea
-                  name="reason"
-                  required
-                  maxLength={1000}
-                  rows={3}
-                  value={reason}
-                  onChange={(event) => setReason(event.target.value)}
-                  placeholder="Record the evidence, constraints, or changes behind your decision."
-                />
-              </label>
-              <label className={styles.acknowledgment}>
-                <input
-                  type="checkbox"
-                  name="scope-acknowledgment"
-                  checked={acknowledged}
-                  onChange={(event) => setAcknowledged(event.target.checked)}
-                  required
-                />
+            <div className={styles.decisionPanel}>
+              <fieldset className={styles.decisionFields} disabled={pending || !canSave}>
+                <legend>Your decision</legend>
+                <label>
+                  Decision
+                  <select
+                    value={decision}
+                    onChange={(event) => setDecision(event.target.value as LocalDecision | '')}
+                    required
+                    name="decision"
+                  >
+                    <option value="">Choose a decision</option>
+                    <option value="approved">Approve plan only</option>
+                    <option value="rejected">Reject plan</option>
+                    <option value="revision-requested">Request revision</option>
+                  </select>
+                </label>
+                <label>
+                  Reviewer <span>{cloud ? '(signed-in account)' : '(self-declared)'}</span>
+                  <input
+                    name="reviewer"
+                    readOnly={cloud}
+                    autoComplete="name"
+                    required
+                    maxLength={100}
+                    value={reviewerName}
+                    onChange={(event) => setReviewer(event.target.value)}
+                    placeholder="Your name"
+                  />
+                </label>
+                <label className={styles.reasonField}>
+                  Decision reason
+                  <textarea
+                    name="reason"
+                    required
+                    maxLength={1000}
+                    minLength={mode === 'sample' ? 8 : 1}
+                    rows={3}
+                    value={reason}
+                    onChange={(event) => setReason(event.target.value)}
+                    placeholder="Record the evidence, constraints, or changes behind your decision."
+                  />
+                </label>
+                <label className={styles.acknowledgment}>
+                  <input
+                    type="checkbox"
+                    name="scope-acknowledgment"
+                    checked={acknowledged}
+                    onChange={(event) => setAcknowledged(event.target.checked)}
+                    required
+                  />
+                  <span>
+                    {mode === 'sample'
+                      ? 'I understand this is a synthetic simulation. My decision stays in this session and does not apply a real change.'
+                      : cloud
+                        ? 'I understand this is an account plan review only. It does not apply a change, override a safety gate, or verify savings.'
+                        : 'I understand this is a local plan review only. It does not apply a change, override a safety gate, or verify savings.'}
+                  </span>
+                </label>
+              </fieldset>
+              <div className={styles.decisionActions}>
                 <span>
                   {mode === 'sample'
-                    ? 'I understand this is a synthetic simulation. My decision stays in this session and does not apply a real change.'
-                    : cloud ? 'I understand this is an account plan review only. It does not apply a change, override a safety gate, or verify savings.' : 'I understand this is a local plan review only. It does not apply a change, override a safety gate, or verify savings.'}
+                    ? 'Synthetic sample · session only'
+                    : 'Plan review only · no deployment'}
                 </span>
-              </label>
-            </fieldset>
+                <button
+                  type="button"
+                  className={styles.secondaryButton}
+                  onClick={onClose}
+                  disabled={pending}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className={styles.primaryButton}
+                  disabled={pending || !canSave}
+                  aria-describedby={error ? errorId : undefined}
+                >
+                  <Icon type="check" />
+                  {pending
+                    ? 'Saving decision…'
+                    : mode === 'sample'
+                      ? 'Save simulated decision'
+                      : 'Record decision'}
+                </button>
+              </div>
+            </div>
           )}
           {!canSave && !completed && (
             <p className={styles.alert} role="alert">
@@ -848,37 +890,46 @@ function ReviewDialogContent({
               {error}
             </p>
           )}
-        </div>
-        <footer className={styles.dialogFooter}>
-          <span>
-            {mode === 'sample'
-              ? 'Synthetic sample · session only'
-              : 'Local plan review · no deployment'}
-          </span>
-          <button
-            type="button"
-            className={styles.secondaryButton}
-            onClick={onClose}
-            disabled={pending}
-          >
-            {completed ? 'Close' : 'Cancel'}
-          </button>
-          {!completed && (!reviewed || revising) && (
-            <button
-              type="submit"
-              className={styles.primaryButton}
-              disabled={pending || !canSave}
-              aria-describedby={error ? errorId : undefined}
-            >
-              <Icon type="check" />
-              {pending
-                ? 'Saving decision…'
-                : mode === 'sample'
-                  ? 'Save simulated decision'
-                  : 'Record decision'}
-            </button>
+          {['ai', 'waste'].includes(opportunity.agentKey) && (
+            <section className={styles.prototypeDemo}>
+              <h4>Try applying a change in the prototype</h4>
+              <p>
+                Plan approval is recorded against this finding. To see an applied change and
+                before-and-after checks, use the separate synthetic demo. Its results stay separate
+                from this saved analysis.
+              </p>
+              <Link
+                className={styles.secondaryButton}
+                href={
+                  opportunity.agentKey === 'ai'
+                    ? '/dashboard/ai-efficiency-demo'
+                    : '/dashboard?tab=waste&sandbox=1'
+                }
+              >
+                Open apply &amp; verify demo
+              </Link>
+            </section>
           )}
-        </footer>
+        </div>
+        {(completed || (reviewed && !revising)) && (
+          <footer className={styles.dialogFooter}>
+            <span>
+              {mode === 'sample'
+                ? 'Synthetic sample · session only'
+                : cloud
+                  ? 'Account plan review · no deployment'
+                  : 'Local plan review · no deployment'}
+            </span>
+            <button
+              type="button"
+              className={styles.secondaryButton}
+              onClick={onClose}
+              disabled={pending}
+            >
+              {completed ? 'Close' : 'Cancel'}
+            </button>
+          </footer>
+        )}
       </form>
     </Container>
   );

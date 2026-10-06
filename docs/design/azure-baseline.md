@@ -1,6 +1,6 @@
 # Design: Azure subscription baseline and carbon translation engine
 
-Status: in progress on `greenops-init`. Prototype scope with synthetic data.
+Status: synthetic baseline, translation, seven-agent assessment and dashboard rollup are implemented in the local prototype (reviewed 6 October 2026). This document retains the design phases and formulas; see [current architecture](../architecture/overview.md) for execution/storage boundaries. Live Azure discovery and writes remain out of scope.
 
 ## Goal
 

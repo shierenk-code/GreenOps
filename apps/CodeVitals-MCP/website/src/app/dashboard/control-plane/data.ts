@@ -25,6 +25,7 @@ import {
   type Opportunity,
   type ResourceRow,
   type TimeRange,
+  type DateWindow,
 } from './types';
 
 const AGENT_ORDER: AgentKey[] = SPECIALIST_KEYS;
@@ -67,7 +68,7 @@ const CATEGORY_AGENT: Record<string, string> = {
   'redundant-pipeline-run': 'pipeline-efficiency',
   'artifact-bloat': 'pipeline-efficiency',
 };
-const DAYS: Record<TimeRange, number> = { '24h': 1, '7d': 7, '30d': 30, '1y': 365 };
+const DAYS = { '24h': 1, '7d': 7, '30d': 30, '1y': 365 };
 const DAY = 86_400_000;
 const numeric = (value: unknown): number =>
   typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : 0;
@@ -177,9 +178,18 @@ function environmentFor(finding: Finding): EnvironmentFilter | null {
   return null;
 }
 
-function withinRange(timestamp: string | null, asOf: string | null, timeRange: TimeRange): boolean {
+export function validDateWindow(window?: DateWindow): boolean {
+  const valid = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;
+  return Boolean(window && valid(window.from) && valid(window.to) && window.from <= window.to);
+}
+function withinRange(timestamp: string | null, asOf: string | null, timeRange: TimeRange, window?: DateWindow): boolean {
   if (!timestamp || !asOf) return false;
   const time = Date.parse(timestamp);
+  if (timeRange === 'custom') {
+    if (!validDateWindow(window)) return false;
+    return time >= Date.parse(window!.from) && time < Date.parse(window!.to) + DAY && time <= Date.parse(asOf);
+  }
   const end = Date.parse(asOf);
   return time <= end && time >= end - DAYS[timeRange] * DAY;
 }
@@ -189,6 +199,7 @@ export function buildRecordedData(
   findings: Finding[],
   environment: EnvironmentFilter,
   timeRange: TimeRange,
+  window?: DateWindow,
 ): ControlPlaneData {
   // Rebuild public fields instead of trusting stale presentation fields supplied by a caller.
   const requestedIds = new Set(findings.map((finding) => finding.bugId));
@@ -197,7 +208,7 @@ export function buildRecordedData(
   const selected = current.filter(
     (finding) =>
       (environment === 'All' || environmentFor(finding) === environment) &&
-      withinRange(validDate(entryFor(finding.entries, 'detect')?.timestamp), asOf, timeRange),
+      withinRange(validDate(entryFor(finding.entries, 'detect')?.timestamp), asOf, timeRange, window),
   );
   const ids = new Set(selected.map((finding) => finding.bugId));
   const scopedRun = run
@@ -419,7 +430,7 @@ export function buildRecordedData(
       })),
     ],
     filterNote: run
-      ? `${selected.length} of ${current.length} findings · ${environment === 'All' ? 'all recorded environments' : `explicit ${environment} tags only`} · detected within ${timeRange} before this snapshot. ${unknownEnvironment} findings have no recognized environment tag and appear only in All. Agent footprint remains run-wide.`
+      ? `${selected.length} of ${current.length} findings · ${environment === 'All' ? 'all recorded environments' : `explicit ${environment} tags only`} · detected ${timeRange === 'custom' ? `between ${window?.from || 'unset'} and ${window?.to || 'unset'} (UTC)` : `within ${timeRange} before this snapshot`}. ${unknownEnvironment} findings have no recognized environment tag and appear only in All. Agent footprint remains run-wide.`
       : 'No saved run loaded. Load a ledger or explore the clearly labeled sample workspace.',
   };
 }
@@ -1257,11 +1268,12 @@ function sampleMetrics(key: SampleKey, records: SampleRecord[]): Metric[] {
 export function buildSampleData(
   environment: EnvironmentFilter,
   timeRange: TimeRange,
+  window?: DateWindow,
 ): ControlPlaneData {
   const selected = sampleRecords().filter(
     (record) =>
       (environment === 'All' || record.environment === environment) &&
-      withinRange(record.timestamp, SAMPLE_AS_OF, timeRange),
+      withinRange(record.timestamp, SAMPLE_AS_OF, timeRange, window),
   );
   const monthlyUsd = selected.reduce((sum, record) => sum + record.monthlyUsd, 0);
   const carbonKg = selected.reduce((sum, record) => sum + record.carbonKg, 0);
@@ -1375,7 +1387,7 @@ export function buildSampleData(
     const timestamp = new Date(Date.parse(SAMPLE_AS_OF) - item.days * DAY).toISOString();
     if (
       (environment !== 'All' && environment !== item.environment) ||
-      !withinRange(timestamp, SAMPLE_AS_OF, timeRange)
+      !withinRange(timestamp, SAMPLE_AS_OF, timeRange, window)
     )
       return [];
     return [
@@ -1492,6 +1504,6 @@ export function buildSampleData(
           'Sample verified rows are fictional historical demonstrations, separate from pending opportunities and recorded runs.',
       },
     ],
-    filterNote: `Synthetic scenario · ${environment === 'All' ? 'Prod and Staging' : environment} · ${selected.length} opportunity groups discovered within ${timeRange} before 4 Oct 2026. Projections remain monthly, not prorated to the selected window. Sample data never changes a recorded run.`,
+    filterNote: `Synthetic scenario · ${environment === 'All' ? 'Prod and Staging' : environment} · ${selected.length} opportunity groups discovered ${timeRange === 'custom' ? `between ${window?.from || 'unset'} and ${window?.to || 'unset'} (UTC)` : `within ${timeRange} before 4 Oct 2026`}. Projections remain monthly, not prorated to the selected window. Sample data never changes a recorded run.`,
   };
 }

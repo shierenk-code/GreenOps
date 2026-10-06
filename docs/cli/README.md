@@ -1,33 +1,42 @@
-# GreenOps CLI reference
+# CLI reference
 
-Run from the repository root after `pnpm install --frozen-lockfile` and `pnpm build`. On Windows PowerShell use `pnpm.cmd`. Every command supports `--help`.
+Run commands from the repository root after installing dependencies and building. Use `pnpm.cmd` on Windows; each command supports `--help`.
 
 ```powershell
-pnpm greenops <command> [options]
+pnpm.cmd greenops <command> --help
 ```
 
-**Model provider:** the committed root `.env` selects Gemini. Commands that use a model (`review`, `run`, and the GitHub listener) call Gemini unless you pass `--provider offline` to `run` or set `GREENOPS_LLM_PROVIDER=offline` in the shell. `carbon` and `waste` never call a model.
+## Common commands
 
-## Sustainability workflow
+| Command                                                 | Purpose                                                                              |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `run <path> --fleet --provider offline --ledger <file>` | Seven-specialist assessment of supplied records without model calls                  |
+| `run <path> --fleet --provider gemini --ledger <file>`  | Same assessment with configured Gemini investigation; fallback is disclosed          |
+| `review <path>`                                         | Read-only sustainability review; supports diff/output options and provider selection |
+| `review <path> --fix`                                   | Requests the approval-gated supported sandbox workflow                               |
+| `run <path> --approve`                                  | Interactive human approval for supported sandbox fixes                               |
+| `scan <path>` / `analyze <path>`                        | Repository summary / AST, symbols and dependency analysis                            |
+| `code-review <path>`                                    | Semantic diff and change impact                                                      |
+| `graph <path>`                                          | Repository graph; see help for callers/callees                                       |
+| `serve`                                                 | Separate GitHub webhook listener; [setup](../github-app-setup.md)                    |
+| `connect '<dashboard URL>'`                             | Link this terminal to a signed-in account                                            |
+| `sync --ledger <file> --project <name>`                 | Upload existing evidence to that account; optional `--watch`                         |
+| `monitor`                                               | Stream machine utilization counters while the command runs; not power measurements   |
+| `disconnect`                                            | Remove the local account connection                                                  |
 
-| Command                                                                   | Purpose                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `review [path]`                                                           | Report Sustainability Bugs without changing files. `--diff` limits to locally changed files; `--format text\|json\|markdown`; `--verbose` shows full findings; `--ledger <path>` (default `./greenops-ledger.json`) records the review; `--fix` runs the approval-gated workflow. No `--provider` flag; uses the environment.                                                                                                                                   |
-| `run [path]`                                                              | Detect → Investigate → Compare → Simulate → Approve → Improve → Verify, written to `--ledger` (default `./greenops-ledger.json`). `--fleet` runs the six specialist agents over fixtures (`--mock-dir`, default `[path]`); `--approve` prompts for human approval of supported sandbox fixes; `--auto` applies only trivial reversible fixes and only when repository policy allows it; `--provider gemini\|openai\|ollama\|offline` overrides the environment. |
-| `carbon demo\|forecast\|plan\|execute\|status\|evidence-template\|verify` | Carbon-aware batch scheduling. `demo --simulate` never touches a cluster. `execute` requires interactive approval. Default ledgers are under `./.tmp/` (`carbon-ledger.json`, demo `carbon-demo-ledger.json`).                                                                                                                                                                                                                                                  |
-| `waste demo\|discover\|plan\|review\|simulate`                            | Digital Waste inventory and right-sizing plans. Read-only; there is no live apply command. Default ledgers are under `./.tmp/` (`waste-ledger.json`, demo `waste-demo-ledger.json`).                                                                                                                                                                                                                                                                            |
+Use `--provider offline` for no-key rehearsals. Google Gemini is the recommended live provider; private environment configuration supplies its API key/model. Legacy provider adapters remain for compatibility.
 
-## Repository intelligence
+## Operational commands
 
-| Command                                                                            | Purpose                                                                                                                                                                                 |
-| ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `scan [path]`                                                                      | File, language and repository summary (`--format text\|json`, `--verbose`, `--quiet`).                                                                                                  |
-| `analyze [path]`                                                                   | AST, symbols, imports/exports, references and dependency graph statistics (`--format text\|json`).                                                                                      |
-| `code-review [path]`                                                               | Semantic diff, blast radius and risk score (`--diff <spec>` default `HEAD~1`, `--base`, `--head` default `HEAD`, `--format text\|json`).                                                |
-| `git status [path]` / `git diff [path]`                                            | Parsed working-tree status and unified diff (`git diff` accepts `--base` default `HEAD~1`, `--head` default `HEAD`, `--format text\|json`).                                             |
-| `graph [path]` / `graph callers <symbol> [path]` / `graph callees <symbol> [path]` | Graph overview (`--format text\|json`) and dependency-graph queries.                                                                                                                    |
-| `serve`                                                                            | GitHub App webhook listener (`--port`, default `3000`; use another port such as `3002` alongside the dashboard; `--secret`, `--token`; see [GitHub App setup](../github-app-setup.md)). |
+- `carbon demo|forecast|plan|execute|status|evidence-template|verify`: constrained batch scheduling. Simulation does not touch a cluster; real dispatch requires separate explicit approval.
+- `waste demo|discover|plan|review|simulate`: read-only discovery and synthetic remediation. There is no live cleanup/resize command.
 
-## Legacy `codevitals` entry point
+Read the [operational safeguards and examples](../operational-workflows.md) before using either path.
 
-`pnpm codevitals ...` remains for compatibility. It exposes the same repository-intelligence commands (with `review` instead of `code-review`) and nests the sustainability commands under `codevitals greenops ...`. It is not the MCP server; that binary is `codevitals-mcp`.
+## Safety and compatibility
+
+`--auto` does not override repository approval policy or make unsupported operations executable. Normal fleet runs and dashboard plan approvals do not deploy infrastructure.
+
+The primary entry point is `pnpm.cmd greenops`. Legacy `codevitals` commands and internal package names remain compatible. The MCP server is separate: its binary is `codevitals-mcp`.
+
+For installation, provider setup and errors, use the [setup guide](../development/getting-started.md).
