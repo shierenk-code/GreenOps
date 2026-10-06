@@ -61,4 +61,6 @@ See [submission status](SUBMISSION.md) and [dated validation history](developmen
 
 ## Maintaining this log
 
+**6 October 2026, presentation packaging:** The user supplied the completed PowerPoint and its SharePoint link. Codex copied it unchanged to `docs/Greenops.pptx`, verified matching SHA-256 hashes and counted 10 slides, then updated submission links. Codex did not author or revise the supplied slides in this step. Content accuracy, visual layout and judge access were not audited; the video remains pending.
+
 For subsequent work append: date, requested task, AI output, accepted/modified/rejected disposition, identified error, correction, verification performed and remaining limitation. Link the relevant commit or test evidence when available; do not invent missing evidence.
