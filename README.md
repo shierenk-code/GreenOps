@@ -15,7 +15,30 @@ A sustainability control plane that finds digital waste, explains recommendation
 - **Demo video:** [Greenops - Flo hackathon shared folder](https://nagarro-my.sharepoint.com/my?id=%2Fpersonal%2Fshieren%5Fkhan%5Fnagarro%5Fcom%2FDocuments%2FGreenops%20%2D%20Flo%20hackathon&viewid=49969cbc%2D7e25%2D4e29%2Db4a1%2D05b80f4e1c51).
 - **AI usage documentation:** [Augmentation log](docs/augmentation-log.md). See [submission assets checklist](docs/submission-assets.md) for remaining deliverables.
 
+## Try the hosted dashboard
+
+Open [GreenOps hosted demo](https://greenops-ewawfqghfeahc4hs.westus3-01.azurewebsites.net/).
+
+1. Click **Workspace**. Sign in, or choose **Create an account** if you are new. Use a unique password of at least 12 characters.
+2. After signing in, choose **Data → Sample scenarios** to explore without installing anything. A new account may have no recorded runs; other users' saved runs are not automatically shared with you.
+3. To view your own CLI assessment, connect your terminal using the optional steps below, sync its ledger, then select the uploaded run in **Run history → Recorded analysis**.
+
+### Optional: connect your terminal to the hosted workspace
+
+Browser sign-in and terminal connection are separate. After completing local installation and generating the sample ledger in step 1 below, run these commands from the **repository root**, not the website folder. No local dashboard server is required for hosted sync.
+
+In the signed-in hosted dashboard, click **Connect terminal** to generate a fresh connection URL. Paste only that URL—not an entire command—inside the quotes:
+
+```powershell
+pnpm.cmd greenops connect 'PASTE_FRESH_CONNECTION_URL_HERE'
+pnpm.cmd greenops sync --ledger ./.tmp/judge-baseline.json --project greenops-demo
+```
+
+Wait for the connection to succeed before syncing. Keep the connection URL private. If sync reports an expired/revoked refresh token, generate a fresh link and repeat `connect`, then retry `sync`; the assessment does not need to be rerun. Azure CLI login is separate from this GreenOps account connection.
+
 ## Quick start
+
+Use this local setup as an alternative to the hosted dashboard, or complete step 1 to generate a ledger for hosted sync.
 
 Requires **Git, Node.js 22.12+ (22.x recommended), npm and pnpm 11.17.0**. Commands below use Windows PowerShell; on macOS/Linux use `pnpm` and `npm` instead of `pnpm.cmd` and `npm.cmd`.
 
