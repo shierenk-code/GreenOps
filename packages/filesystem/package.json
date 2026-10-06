@@ -1,0 +1,21 @@
+{
+  "name": "@codevitals/filesystem",
+  "version": "0.14.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@codevitals/core": "workspace:*",
+    "@codevitals/errors": "workspace:*",
+    "@codevitals/logger": "workspace:*",
+    "ignore": "^7.0.10"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint \"src/**/*.ts\""
+  }
+}

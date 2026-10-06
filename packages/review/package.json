@@ -1,0 +1,22 @@
+{
+  "name": "@codevitals/review",
+  "version": "0.14.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@codevitals/ast": "workspace:*",
+    "@codevitals/core": "workspace:*",
+    "@codevitals/git": "workspace:*",
+    "@codevitals/graph": "workspace:*",
+    "@codevitals/parser": "workspace:*",
+    "@codevitals/references": "workspace:*",
+    "@codevitals/repository": "workspace:*",
+    "@codevitals/symbols": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint \"src/**/*.ts\""
+  }
+}

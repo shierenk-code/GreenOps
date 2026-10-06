@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - greenops-init
+  pull_request:
+    branches:
+      - main
+      - greenops-init
+
+jobs:
+  test:
+    name: Lint, Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.17.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install dashboard dependencies and security patches
+        run: npm ci --prefix apps/CodeVitals-MCP/website
+
+      - name: Verify dependency security patches
+        run: pnpm exec vitest run tests/braces-security.test.ts
+
+      - name: Check version consistency
+        run: pnpm version:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+      - name: Test MCP server (Jest)
+        run: pnpm --filter codevitals-mcp test

@@ -1,0 +1,63 @@
+{
+  "service": "support-assistant",
+  "calls": [
+    {
+      "id": "c1",
+      "prompt": "Summarize ticket #100",
+      "promptTokens": 80,
+      "maxTokens": 512,
+      "completionTokens": 120,
+      "status": "ok",
+      "cacheable": true
+    },
+    {
+      "id": "c2",
+      "prompt": "Summarize ticket #100",
+      "promptTokens": 80,
+      "maxTokens": 512,
+      "completionTokens": 120,
+      "status": "ok",
+      "cacheable": true
+    },
+    {
+      "id": "c3",
+      "prompt": "Summarize ticket #100",
+      "promptTokens": 80,
+      "maxTokens": 512,
+      "completionTokens": 120,
+      "status": "ok",
+      "cacheable": true
+    },
+    {
+      "id": "c4",
+      "prompt": "Classify sentiment",
+      "maxTokens": 2000,
+      "completionTokens": 15,
+      "status": "ok"
+    },
+    {
+      "id": "c5",
+      "prompt": "Classify sentiment",
+      "maxTokens": 2000,
+      "completionTokens": 15,
+      "status": "ok"
+    },
+    {
+      "id": "c6",
+      "prompt": "Generate weekly report",
+      "promptTokens": 600,
+      "maxTokens": 4096,
+      "completionTokens": 900,
+      "status": "error",
+      "retries": 5,
+      "retryBackoffMs": 0
+    },
+    {
+      "id": "c7",
+      "prompt": "Translate greeting",
+      "maxTokens": 800,
+      "completionTokens": 40,
+      "status": "ok"
+    }
+  ]
+}

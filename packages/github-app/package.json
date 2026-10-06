@@ -1,0 +1,22 @@
+{
+  "name": "@codevitals/github-app",
+  "version": "0.14.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@codevitals/config": "workspace:*",
+    "@codevitals/connectors": "workspace:*",
+    "@codevitals/core": "workspace:*",
+    "@codevitals/git": "workspace:*",
+    "@codevitals/graph": "workspace:*",
+    "@codevitals/logger": "workspace:*",
+    "@codevitals/review": "workspace:*",
+    "@greenops/agent": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint \"src/**/*.ts\""
+  }
+}

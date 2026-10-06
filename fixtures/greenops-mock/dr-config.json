@@ -1,0 +1,8 @@
+{
+  "estate": "patagonia-dr",
+  "services": [
+    { "name": "billing-db", "criticality": "high", "replicas": 3, "standbyMode": "hot", "standbyCores": 8, "rpoMinutes": 5, "replicationMode": "continuous" },
+    { "name": "reporting-db", "criticality": "low", "replicas": 3, "standbyMode": "hot", "standbyCores": 4, "rpoMinutes": 120, "replicationMode": "continuous" },
+    { "name": "cache-tier", "criticality": "medium", "replicas": 4, "standbyMode": "hot", "standbyCores": 2, "rpoMinutes": 60, "replicationMode": "continuous" }
+  ]
+}

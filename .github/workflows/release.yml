@@ -1,0 +1,113 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+      - greenops-init
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+      - greenops-init
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Automatic Semantic Release
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'chore(release):')) ||
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    steps:
+      - name: Determine Target Branch
+        id: branch
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+          else
+            TARGET_BRANCH="${{ github.ref_name }}"
+          fi
+          echo "target_branch=$TARGET_BRANCH" >> $GITHUB_OUTPUT
+          echo "Target branch is: $TARGET_BRANCH"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.branch.outputs.target_branch }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.17.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Determine & Bump Version
+        id: bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Fetch all tags from remote
+          git fetch --tags --force
+          
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          echo "Latest tag found: $LATEST_TAG"
+          
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current monorepo version in package.json: $CURRENT_VERSION"
+          
+          # Run version bump detection script
+          node scripts/version.mjs
+          
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "Calculated version: $NEW_VERSION"
+          
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$NEW_VERSION" >> $GITHUB_OUTPUT
+          
+          if [ "v$NEW_VERSION" = "$LATEST_TAG" ]; then
+            echo "should_release=false" >> $GITHUB_OUTPUT
+            echo "Version unchanged ($LATEST_TAG already exists). No new release needed."
+          else
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "New release will be published: v$NEW_VERSION"
+          fi
+
+      - name: Commit, Tag & Push Release
+        if: steps.bump.outputs.should_release == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.bump.outputs.version }}"
+          TAG="${{ steps.bump.outputs.tag }}"
+          TARGET_BRANCH="${{ steps.branch.outputs.target_branch }}"
+          
+          echo "Releasing $TAG on branch $TARGET_BRANCH"
+          
+          # Stage and commit version changes
+          git add package.json apps/*/package.json packages/*/package.json apps/cli/src/cli.ts
+          git commit -m "chore(release): v$VERSION [skip ci]" || true
+          
+          # Create git tag
+          git tag "$TAG"
+          
+          # Push commit and tag to the branch
+          git push origin "$TARGET_BRANCH" --tags || git push origin "$TAG"
+          
+          # Generate release notes and create GitHub release
+          gh release create "$TAG" --generate-notes --title "v$VERSION"

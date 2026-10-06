@@ -1,0 +1,169 @@
+.panel {
+  border: 1px solid var(--border, #ddd);
+  margin: 2rem 0;
+  background: var(--background, #fafaf8);
+  color: var(--foreground, #191919);
+}
+.panel header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 32px;
+  border-bottom: 1px solid #ddd;
+}
+.panel h2 {
+  font-size: clamp(28px, 3vw, 44px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  margin: 12px 0;
+}
+.panel p {
+  line-height: 1.6;
+  margin: 12px 0;
+}
+.panel p svg {
+  display: inline;
+  vertical-align: middle;
+}
+.live {
+  color: #53744d;
+}
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.columns > div {
+  padding: 28px;
+  min-width: 0;
+}
+.metrics {
+  border-right: 1px solid #ddd;
+}
+.panel select {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  background: transparent;
+  color: inherit;
+  margin: 8px 0;
+}
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin: 24px 0;
+}
+.stats strong {
+  display: block;
+  font-size: clamp(22px, 2.5vw, 34px);
+  font-weight: 500;
+}
+.panel h3 {
+  font-size: 17px;
+  margin: 18px 0 8px;
+}
+.metrics > svg {
+  width: 100%;
+  height: auto;
+  max-height: 150px;
+}
+.panel small {
+  display: block;
+  color: #747474;
+  line-height: 1.6;
+}
+.panel button {
+  padding: 12px 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #191919;
+  color: #fff;
+  border: 0;
+  cursor: pointer;
+  margin: 12px 0;
+  transition: background 0.2s;
+}
+.panel button:hover {
+  background: #d84920;
+}
+.panel button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.panel button:focus-visible {
+  outline: 3px solid #ffab00;
+  outline-offset: 3px;
+}
+.assessment {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  padding: 20px;
+  background: #f1eee7;
+  margin: 16px 0;
+  color: #191919;
+}
+.map {
+  position: relative;
+  aspect-ratio: 2/1;
+  background: #f1f0eb;
+  margin: 20px 0;
+}
+.land {
+  position: absolute;
+  inset: 0;
+  background: #bbb;
+  mask: url('/maps/world-land.svg') center / 100% 100% no-repeat;
+}
+.panel .marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 0;
+  width: 26px;
+  height: 26px;
+  justify-content: center;
+  border-radius: 50%;
+  margin: 0;
+  background: #ff531f;
+  color: #fff;
+  border: 2px solid #fff;
+}
+.panel .marker[aria-pressed='true'] {
+  outline: 3px solid #ffab00;
+}
+.intensity {
+  font-size: clamp(30px, 4vw, 52px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+.panel footer {
+  border-top: 1px solid #ddd;
+  padding: 24px 32px;
+}
+.panel a {
+  color: #cd481d;
+}
+.panel code {
+  background: #efede7;
+  padding: 4px;
+  color: #191919;
+}
+@media (max-width: 850px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+  .metrics {
+    border-right: 0;
+    border-bottom: 1px solid #ddd;
+  }
+  .panel header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .columns > div,
+  .panel header {
+    padding: 20px;
+  }
+}

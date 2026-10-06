@@ -1,0 +1,32 @@
+name: Enforce Branch Policy
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  check-branch-flow:
+    name: Verify Source Branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR Source Branch
+        run: |
+          HEAD_REF="${{ github.head_ref }}"
+          BASE_REF="${{ github.base_ref }}"
+          
+          echo "Base branch: $BASE_REF"
+          echo "Head branch: $HEAD_REF"
+          
+          if [ "$BASE_REF" = "main" ]; then
+            if [ "$HEAD_REF" != "greenops-init" ] && [[ ! "$HEAD_REF" =~ ^hotfix/ ]] && [[ ! "$HEAD_REF" =~ ^release/ ]]; then
+              echo "::error title=Branch Policy Violation::Pull requests to 'main' must originate from 'greenops-init' (or 'hotfix/*' / 'release/*'). Please merge your changes into 'greenops-init' first."
+              exit 1
+            fi
+          fi
+          
+          echo "Branch flow validation passed: $HEAD_REF -> $BASE_REF"

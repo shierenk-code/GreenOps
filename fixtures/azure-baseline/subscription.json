@@ -1,0 +1,763 @@
+{
+  "schemaVersion": 1,
+  "provenance": "synthetic",
+  "note": "Synthetic Azure subscription export for GreenOps demonstrations. Raw facts only (inventory, SKUs, regions, utilization, cost, pipeline runs, AI gateway logs). No waste labels, recommendations or carbon results: GreenOps agents and the translation engine compute those.",
+  "organization": "Contoso Retail (synthetic)",
+  "subscriptionId": "sub-contoso-retail-01",
+  "tenantId": "tenant-contoso-demo",
+  "period": { "start": "2026-09-01T00:00:00Z", "end": "2026-10-01T00:00:00Z", "hours": 720 },
+  "businessHours": { "timezone": "UTC", "weekdays": "Mon-Fri", "start": "08:00", "end": "18:00" },
+  "regions": ["eastus", "northeurope", "centralindia"],
+  "teams": [
+    { "id": "platform", "name": "Platform Engineering" },
+    { "id": "commerce", "name": "Commerce" },
+    { "id": "data", "name": "Data & Analytics" },
+    { "id": "ai-assistants", "name": "AI Assistants" },
+    { "id": "corp-it", "name": "Corporate IT" }
+  ],
+  "resources": [
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-data-dev/providers/Microsoft.Compute/virtualMachines/vm-legacy-batch-01",
+      "name": "vm-legacy-batch-01",
+      "type": "Microsoft.Compute/virtualMachines",
+      "sku": "Standard_D8s_v5",
+      "vCpu": 8,
+      "memoryGb": 32,
+      "region": "centralindia",
+      "tags": { "env": "dev", "team": "data", "owner": "team-data" },
+      "costUsd": 281.0,
+      "metrics": {
+        "runtimeHours": 720,
+        "offHoursRuntimeHours": 500,
+        "cpu": { "avgPct": 4.2, "p95Pct": 9.0, "samples": 720 }
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-commerce-dev/providers/Microsoft.Compute/virtualMachines/vm-dev-sandbox-02",
+      "name": "vm-dev-sandbox-02",
+      "type": "Microsoft.Compute/virtualMachines",
+      "sku": "Standard_D4s_v5",
+      "vCpu": 4,
+      "memoryGb": 16,
+      "region": "eastus",
+      "tags": { "env": "dev", "team": "commerce", "owner": "team-commerce" },
+      "costUsd": 140.2,
+      "metrics": {
+        "runtimeHours": 720,
+        "offHoursRuntimeHours": 500,
+        "cpu": { "avgPct": 2.1, "p95Pct": 6.5, "samples": 720 }
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-commerce-dev/providers/Microsoft.Compute/virtualMachines/vm-dev-sandbox-03",
+      "name": "vm-dev-sandbox-03",
+      "type": "Microsoft.Compute/virtualMachines",
+      "sku": "Standard_D4s_v5",
+      "vCpu": 4,
+      "memoryGb": 16,
+      "region": "eastus",
+      "tags": { "env": "dev", "team": "commerce", "owner": "team-commerce" },
+      "costUsd": 140.2,
+      "metrics": {
+        "runtimeHours": 720,
+        "offHoursRuntimeHours": 500,
+        "cpu": { "avgPct": 3.0, "p95Pct": 7.8, "samples": 720 }
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-platform-dev/providers/Microsoft.Compute/virtualMachines/vm-dev-sandbox-04",
+      "name": "vm-dev-sandbox-04",
+      "type": "Microsoft.Compute/virtualMachines",
+      "sku": "Standard_D4s_v5",
+      "vCpu": 4,
+      "memoryGb": 16,
+      "region": "northeurope",
+      "tags": { "env": "dev", "team": "platform", "owner": "team-platform" },
+      "costUsd": 152.6,
+      "metrics": {
+        "runtimeHours": 720,
+        "offHoursRuntimeHours": 500,
+        "cpu": { "avgPct": 14.0, "p95Pct": 62.0, "offHoursAvgPct": 1.5, "samples": 720 }
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-commerce-dev/providers/Microsoft.Compute/virtualMachines/vm-dev-active-05",
+      "name": "vm-dev-active-05",
+      "type": "Microsoft.Compute/virtualMachines",
+      "sku": "Standard_D2s_v5",
+      "vCpu": 2,
+      "memoryGb": 8,
+      "region": "eastus",
+      "tags": {
+        "env": "dev",
+        "team": "commerce",
+        "owner": "team-commerce",
+        "schedule": "auto-shutdown-19:00"
+      },
+      "costUsd": 22.4,
+      "metrics": {
+        "runtimeHours": 220,
+        "offHoursRuntimeHours": 0,
+        "cpu": { "avgPct": 41.0, "p95Pct": 77.0, "samples": 220 }
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-data-prod/providers/Microsoft.Compute/virtualMachines/vm-reporting-01",
+      "name": "vm-reporting-01",
+      "type": "Microsoft.Compute/virtualMachines",
+      "sku": "Standard_D4s_v5",
+      "vCpu": 4,
+      "memoryGb": 16,
+      "region": "centralindia",
+      "tags": {
+        "env": "prod",
+        "team": "data",
+        "owner": "team-data",
+        "iacSource": "infra/data/reporting.bicep",
+        "dataResidency": "none"
+      },
+      "costUsd": 133.9,
+      "metrics": {
+        "runtimeHours": 720,
+        "offHoursRuntimeHours": 500,
+        "cpu": { "avgPct": 46.0, "p95Pct": 78.0, "samples": 720 }
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-data-prod/providers/Microsoft.Compute/virtualMachines/vm-nightly-etl-01",
+      "name": "vm-nightly-etl-01",
+      "type": "Microsoft.Compute/virtualMachines",
+      "sku": "Standard_E8s_v5",
+      "vCpu": 8,
+      "memoryGb": 64,
+      "region": "northeurope",
+      "tags": {
+        "env": "prod",
+        "team": "data",
+        "owner": "team-data",
+        "iacSource": "infra/data/etl.bicep"
+      },
+      "costUsd": 412.3,
+      "metrics": {
+        "runtimeHours": 720,
+        "offHoursRuntimeHours": 500,
+        "cpu": { "avgPct": 22.0, "p95Pct": 96.0, "samples": 720 }
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-commerce-prod/providers/Microsoft.Compute/virtualMachineScaleSets/vmss-web-frontend",
+      "name": "vmss-web-frontend",
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "sku": "Standard_D4s_v5",
+      "vCpu": 4,
+      "memoryGb": 16,
+      "instances": 4,
+      "autoscale": { "enabled": false },
+      "region": "eastus",
+      "tags": {
+        "env": "prod",
+        "team": "commerce",
+        "owner": "team-commerce",
+        "iacSource": "infra/commerce/web.bicep"
+      },
+      "costUsd": 560.8,
+      "metrics": {
+        "runtimeHours": 720,
+        "offHoursRuntimeHours": 500,
+        "cpu": { "avgPct": 18.0, "p95Pct": 35.0, "samples": 720 }
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-platform-prod/providers/Microsoft.Compute/virtualMachineScaleSets/vmss-build-agents",
+      "name": "vmss-build-agents",
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "sku": "Standard_D4s_v5",
+      "vCpu": 4,
+      "memoryGb": 16,
+      "instances": 2,
+      "autoscale": { "enabled": true, "min": 1, "max": 6 },
+      "region": "northeurope",
+      "tags": {
+        "env": "prod",
+        "team": "platform",
+        "owner": "team-platform",
+        "iacSource": "infra/platform/build-agents.bicep"
+      },
+      "costUsd": 238.1,
+      "metrics": {
+        "runtimeHours": 720,
+        "offHoursRuntimeHours": 500,
+        "cpu": { "avgPct": 31.0, "p95Pct": 88.0, "samples": 720 }
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-commerce-prod/providers/Microsoft.Web/serverFarms/asp-commerce-api",
+      "name": "asp-commerce-api",
+      "type": "Microsoft.Web/serverFarms",
+      "sku": "P2v3",
+      "vCpu": 4,
+      "memoryGb": 16,
+      "instances": 2,
+      "autoscale": { "enabled": true, "min": 2, "max": 6 },
+      "region": "eastus",
+      "tags": { "env": "prod", "team": "commerce", "owner": "team-commerce" },
+      "costUsd": 467.2,
+      "metrics": {
+        "runtimeHours": 720,
+        "offHoursRuntimeHours": 500,
+        "cpu": { "avgPct": 38.0, "p95Pct": 70.0, "samples": 720 }
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-commerce-prod/providers/Microsoft.Web/serverFarms/asp-marketing-site",
+      "name": "asp-marketing-site",
+      "type": "Microsoft.Web/serverFarms",
+      "sku": "P3v3",
+      "vCpu": 8,
+      "memoryGb": 32,
+      "instances": 2,
+      "autoscale": { "enabled": false },
+      "region": "northeurope",
+      "tags": { "env": "prod", "team": "commerce", "owner": "team-commerce" },
+      "costUsd": 1012.4,
+      "metrics": {
+        "runtimeHours": 720,
+        "offHoursRuntimeHours": 500,
+        "cpu": { "avgPct": 3.5, "p95Pct": 6.0, "offHoursAvgPct": 1.1, "samples": 720 }
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-commerce-dev/providers/Microsoft.Web/serverFarms/asp-dev-preview",
+      "name": "asp-dev-preview",
+      "type": "Microsoft.Web/serverFarms",
+      "sku": "P1v3",
+      "vCpu": 2,
+      "memoryGb": 8,
+      "instances": 1,
+      "autoscale": { "enabled": false },
+      "region": "eastus",
+      "tags": { "env": "dev", "team": "commerce", "owner": "team-commerce" },
+      "costUsd": 116.8,
+      "metrics": {
+        "runtimeHours": 720,
+        "offHoursRuntimeHours": 500,
+        "cpu": { "avgPct": 1.2, "p95Pct": 4.0, "samples": 720 }
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-platform-prod/providers/Microsoft.ContainerService/managedClusters/aks-prod-eastus",
+      "name": "aks-prod-eastus",
+      "type": "Microsoft.ContainerService/managedClusters",
+      "region": "eastus",
+      "tags": {
+        "env": "prod",
+        "team": "platform",
+        "owner": "team-platform",
+        "iacSource": "infra/platform/aks.bicep"
+      },
+      "costUsd": 1389.5,
+      "nodePools": [
+        {
+          "name": "system",
+          "sku": "Standard_D4s_v5",
+          "vCpu": 4,
+          "memoryGb": 16,
+          "nodes": 3,
+          "autoscale": { "enabled": false },
+          "metrics": {
+            "runtimeHours": 720,
+            "cpu": { "avgPct": 28.0, "p95Pct": 52.0, "samples": 720 }
+          }
+        },
+        {
+          "name": "apps",
+          "sku": "Standard_D8s_v5",
+          "vCpu": 8,
+          "memoryGb": 32,
+          "nodes": 8,
+          "autoscale": { "enabled": true, "min": 4, "max": 10 },
+          "metrics": {
+            "runtimeHours": 720,
+            "cpu": { "avgPct": 21.0, "p95Pct": 44.0, "samples": 720 }
+          }
+        }
+      ],
+      "workloads": [
+        {
+          "name": "api-gateway",
+          "team": "commerce",
+          "requestedCpuCores": 4,
+          "usedCpuCoresP95": 0.6,
+          "replicas": 6
+        },
+        {
+          "name": "batch-worker",
+          "team": "data",
+          "requestedCpuCores": 8,
+          "usedCpuCoresP95": 1.2,
+          "replicas": 3
+        },
+        {
+          "name": "auth-service",
+          "team": "platform",
+          "requestedCpuCores": 2,
+          "usedCpuCoresP95": 1.5,
+          "replicas": 2
+        }
+      ]
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-platform-prod/providers/Microsoft.Compute/disks/disk-snap-restore-04",
+      "name": "disk-snap-restore-04",
+      "type": "Microsoft.Compute/disks",
+      "sku": "Premium_LRS",
+      "sizeGb": 1024,
+      "media": "ssd",
+      "redundancy": "LRS",
+      "region": "eastus",
+      "tags": { "env": "prod", "team": "platform", "owner": "team-platform" },
+      "costUsd": 135.2,
+      "metrics": { "attachedTo": null, "unattachedDays": 42, "lastReadDaysAgo": 41 }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-data-prod/providers/Microsoft.Compute/disks/disk-migration-legacy",
+      "name": "disk-migration-legacy",
+      "type": "Microsoft.Compute/disks",
+      "sku": "Premium_LRS",
+      "sizeGb": 256,
+      "media": "ssd",
+      "redundancy": "LRS",
+      "region": "northeurope",
+      "tags": { "env": "prod", "team": "data", "owner": "team-data" },
+      "costUsd": 38.0,
+      "metrics": { "attachedTo": null, "unattachedDays": 90, "lastReadDaysAgo": 88 }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-data-dev/providers/Microsoft.Compute/disks/disk-scratch-tmp",
+      "name": "disk-scratch-tmp",
+      "type": "Microsoft.Compute/disks",
+      "sku": "StandardSSD_LRS",
+      "sizeGb": 64,
+      "media": "ssd",
+      "redundancy": "LRS",
+      "region": "centralindia",
+      "tags": { "env": "dev", "team": "data", "owner": "team-data" },
+      "costUsd": 4.8,
+      "metrics": { "attachedTo": null, "unattachedDays": 3, "lastReadDaysAgo": 3 }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-data-prod/providers/Microsoft.Compute/disks/disk-etl-data-01",
+      "name": "disk-etl-data-01",
+      "type": "Microsoft.Compute/disks",
+      "sku": "Premium_LRS",
+      "sizeGb": 512,
+      "media": "ssd",
+      "redundancy": "LRS",
+      "region": "northeurope",
+      "tags": { "env": "prod", "team": "data", "owner": "team-data" },
+      "costUsd": 76.0,
+      "metrics": {
+        "attachedTo": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-data-prod/providers/Microsoft.Compute/virtualMachines/vm-nightly-etl-01",
+        "unattachedDays": 0,
+        "lastReadDaysAgo": 0
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-platform-prod/providers/Microsoft.ContainerRegistry/registries/acrcontososhared",
+      "name": "acrcontososhared",
+      "type": "Microsoft.ContainerRegistry/registries",
+      "sku": "Premium",
+      "region": "eastus",
+      "tags": { "env": "prod", "team": "platform", "owner": "team-platform" },
+      "costUsd": 50.0,
+      "images": [
+        { "name": "api-gateway:latest", "team": "commerce", "sizeMb": 2400, "pullsPerMonth": 1800 },
+        { "name": "batch-worker:latest", "team": "data", "sizeMb": 950, "pullsPerMonth": 420 },
+        { "name": "auth-service:slim", "team": "platform", "sizeMb": 180, "pullsPerMonth": 260 }
+      ]
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-platform-prod/providers/Microsoft.OperationalInsights/workspaces/law-prod-eastus",
+      "name": "law-prod-eastus",
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "region": "eastus",
+      "tags": { "env": "prod", "team": "platform", "owner": "team-platform" },
+      "costUsd": 1060.0,
+      "tables": [
+        {
+          "name": "ApiGatewayDebug_CL",
+          "team": "commerce",
+          "gbPerDay": 12,
+          "retentionDays": 90,
+          "queriesLast30Days": 3
+        },
+        {
+          "name": "AuditTrail_CL",
+          "team": "platform",
+          "gbPerDay": 1,
+          "retentionDays": 365,
+          "queriesLast30Days": 40,
+          "complianceRetentionDays": 365
+        },
+        {
+          "name": "AppRequests",
+          "team": "commerce",
+          "gbPerDay": 4,
+          "retentionDays": 30,
+          "queriesLast30Days": 220
+        }
+      ]
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-commerce-prod/providers/Microsoft.Sql/servers/sql-contoso-eastus/databases/billing-db",
+      "name": "billing-db",
+      "type": "Microsoft.Sql/servers/databases",
+      "sku": "BusinessCritical_Gen5_8",
+      "vCpu": 8,
+      "memoryGb": 41,
+      "region": "eastus",
+      "tags": {
+        "env": "prod",
+        "team": "commerce",
+        "owner": "team-commerce",
+        "criticality": "high"
+      },
+      "costUsd": 3020.0,
+      "metrics": { "runtimeHours": 720, "cpu": { "avgPct": 34.0, "p95Pct": 71.0, "samples": 720 } },
+      "dr": {
+        "rpoTargetMinutes": 5,
+        "rtoTargetMinutes": 30,
+        "replicationMode": "continuous",
+        "replicas": [{ "region": "northeurope", "mode": "hot", "vCpu": 8, "cpuAvgPct": 6.0 }]
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-data-prod/providers/Microsoft.Sql/servers/sql-contoso-india/databases/reporting-db",
+      "name": "reporting-db",
+      "type": "Microsoft.Sql/servers/databases",
+      "sku": "GeneralPurpose_Gen5_4",
+      "vCpu": 4,
+      "memoryGb": 20,
+      "region": "centralindia",
+      "tags": { "env": "prod", "team": "data", "owner": "team-data", "criticality": "low" },
+      "costUsd": 1180.0,
+      "metrics": { "runtimeHours": 720, "cpu": { "avgPct": 12.0, "p95Pct": 30.0, "samples": 720 } },
+      "dr": {
+        "rpoTargetMinutes": 1440,
+        "rtoTargetMinutes": 480,
+        "replicationMode": "continuous",
+        "replicas": [
+          { "region": "eastus", "mode": "hot", "vCpu": 4, "cpuAvgPct": 2.0 },
+          { "region": "northeurope", "mode": "hot", "vCpu": 4, "cpuAvgPct": 2.0 }
+        ]
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-commerce-prod/providers/Microsoft.Cache/redis/redis-session-cache",
+      "name": "redis-session-cache",
+      "type": "Microsoft.Cache/redis",
+      "sku": "Premium_P2",
+      "vCpu": 4,
+      "memoryGb": 13,
+      "region": "eastus",
+      "tags": {
+        "env": "prod",
+        "team": "commerce",
+        "owner": "team-commerce",
+        "criticality": "medium"
+      },
+      "costUsd": 1640.0,
+      "metrics": { "runtimeHours": 720, "cpu": { "avgPct": 9.0, "p95Pct": 18.0, "samples": 720 } },
+      "dr": {
+        "rpoTargetMinutes": 60,
+        "rtoTargetMinutes": 60,
+        "replicationMode": "continuous",
+        "replicas": [
+          { "region": "eastus", "mode": "hot", "vCpu": 4, "cpuAvgPct": 1.5 },
+          { "region": "eastus", "mode": "hot", "vCpu": 4, "cpuAvgPct": 1.5 },
+          { "region": "northeurope", "mode": "hot", "vCpu": 4, "cpuAvgPct": 1.0 }
+        ]
+      }
+    },
+    {
+      "id": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-ai-prod/providers/Microsoft.CognitiveServices/accounts/aoai-contoso-eastus",
+      "name": "aoai-contoso-eastus",
+      "type": "Microsoft.CognitiveServices/accounts",
+      "sku": "S0",
+      "region": "eastus",
+      "tags": { "env": "prod", "team": "ai-assistants", "owner": "team-ai" },
+      "costUsd": 4210.0,
+      "deployments": [
+        { "name": "gpt-4o", "model": "gpt-4o", "capacityTpm": 240000 },
+        { "name": "gpt-4o-mini", "model": "gpt-4o-mini", "capacityTpm": 500000 }
+      ]
+    }
+  ],
+  "timeseries": [
+    {
+      "resourceId": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-data-prod/providers/Microsoft.Compute/virtualMachines/vm-nightly-etl-01",
+      "metric": "cpuPct",
+      "intervalMinutes": 60,
+      "samples": [
+        { "t": "2026-09-29T00:00:00Z", "value": 20 },
+        { "t": "2026-09-29T01:00:00Z", "value": 21 },
+        { "t": "2026-09-29T02:00:00Z", "value": 19 },
+        { "t": "2026-09-29T03:00:00Z", "value": 98 },
+        { "t": "2026-09-29T04:00:00Z", "value": 20 },
+        { "t": "2026-09-29T05:00:00Z", "value": 19 },
+        { "t": "2026-09-29T06:00:00Z", "value": 100 },
+        { "t": "2026-09-29T07:00:00Z", "value": 20 },
+        { "t": "2026-09-29T08:00:00Z", "value": 18 },
+        { "t": "2026-09-29T09:00:00Z", "value": 19 },
+        { "t": "2026-09-29T10:00:00Z", "value": 18 },
+        { "t": "2026-09-29T11:00:00Z", "value": 20 }
+      ]
+    },
+    {
+      "region": "northeurope",
+      "metric": "gridGCo2PerKwh",
+      "intervalMinutes": 60,
+      "kind": "synthetic",
+      "samples": [
+        { "t": "2026-09-29T00:00:00Z", "value": 210 },
+        { "t": "2026-09-29T01:00:00Z", "value": 200 },
+        { "t": "2026-09-29T02:00:00Z", "value": 195 },
+        { "t": "2026-09-29T03:00:00Z", "value": 205 },
+        { "t": "2026-09-29T04:00:00Z", "value": 230 },
+        { "t": "2026-09-29T05:00:00Z", "value": 270 },
+        { "t": "2026-09-29T06:00:00Z", "value": 330 },
+        { "t": "2026-09-29T07:00:00Z", "value": 360 },
+        { "t": "2026-09-29T08:00:00Z", "value": 350 },
+        { "t": "2026-09-29T09:00:00Z", "value": 320 },
+        { "t": "2026-09-29T10:00:00Z", "value": 300 },
+        { "t": "2026-09-29T11:00:00Z", "value": 290 }
+      ]
+    }
+  ],
+  "pipelines": [
+    {
+      "id": "commerce-api-ci",
+      "repository": "contoso/commerce-api",
+      "team": "commerce",
+      "system": "github-actions",
+      "runner": { "kind": "hosted", "sku": "Hosted-Ubuntu-4core", "region": "eastus" },
+      "runsThisPeriod": 420,
+      "prsMerged": 140,
+      "runsWithDuplicateCommit": 96,
+      "durationMinutes": { "median": 38, "p95": 52 },
+      "cpuAvgPct": 55,
+      "cache": { "hits": 92, "misses": 328 },
+      "dockerLayerReuse": false,
+      "artifactMbPerRun": 1800,
+      "triggers": ["push", "pull_request"]
+    },
+    {
+      "id": "web-frontend-ci",
+      "repository": "contoso/web-frontend",
+      "team": "commerce",
+      "system": "github-actions",
+      "runner": { "kind": "hosted", "sku": "Hosted-Ubuntu-2core", "region": "eastus" },
+      "runsThisPeriod": 610,
+      "prsMerged": 230,
+      "runsWithDuplicateCommit": 140,
+      "durationMinutes": { "median": 9, "p95": 14 },
+      "cpuAvgPct": 60,
+      "cache": { "hits": 390, "misses": 220 },
+      "dockerLayerReuse": true,
+      "artifactMbPerRun": 120,
+      "triggers": ["push", "pull_request"]
+    },
+    {
+      "id": "data-platform-ci",
+      "repository": "contoso/data-platform",
+      "team": "data",
+      "system": "azure-pipelines",
+      "runner": {
+        "kind": "self-hosted",
+        "resourceId": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-platform-prod/providers/Microsoft.Compute/virtualMachineScaleSets/vmss-build-agents"
+      },
+      "runsThisPeriod": 160,
+      "prsMerged": 70,
+      "runsWithDuplicateCommit": 4,
+      "durationMinutes": { "median": 12, "p95": 18 },
+      "cpuAvgPct": 65,
+      "cache": { "hits": 130, "misses": 30 },
+      "dockerLayerReuse": true,
+      "artifactMbPerRun": 300,
+      "triggers": ["pull_request"]
+    }
+  ],
+  "aiWorkloads": [
+    {
+      "id": "support-assistant",
+      "team": "ai-assistants",
+      "accountId": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-ai-prod/providers/Microsoft.CognitiveServices/accounts/aoai-contoso-eastus",
+      "deployment": "gpt-4o",
+      "task": "conversational support answers",
+      "requests": 14200,
+      "inputTokens": 45440000,
+      "outputTokens": 9656000,
+      "cacheHits": 4899,
+      "repeatablePromptShare": 0.62,
+      "repeatedContextTokens": 18500000,
+      "maxTokensConfigured": 4096,
+      "errors": 120,
+      "retries": 140,
+      "retryBackoffMs": 800,
+      "sampledCalls": [
+        {
+          "fingerprint": "fp-ticket-summary",
+          "inputTokens": 3200,
+          "outputTokens": 680,
+          "cacheable": true,
+          "occurrences": 8800
+        },
+        {
+          "fingerprint": "fp-policy-lookup",
+          "inputTokens": 2900,
+          "outputTokens": 420,
+          "cacheable": true,
+          "occurrences": 2100
+        },
+        {
+          "fingerprint": "fp-free-form",
+          "inputTokens": 3400,
+          "outputTokens": 900,
+          "cacheable": false,
+          "occurrences": 3300
+        }
+      ]
+    },
+    {
+      "id": "ticket-classifier",
+      "team": "ai-assistants",
+      "accountId": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-ai-prod/providers/Microsoft.CognitiveServices/accounts/aoai-contoso-eastus",
+      "deployment": "gpt-4o",
+      "task": "sentiment and category classification",
+      "requests": 52000,
+      "inputTokens": 11440000,
+      "outputTokens": 312000,
+      "cacheHits": 0,
+      "repeatablePromptShare": 0.1,
+      "repeatedContextTokens": 0,
+      "maxTokensConfigured": 2000,
+      "errors": 30,
+      "retries": 30,
+      "retryBackoffMs": 500,
+      "sampledCalls": [
+        {
+          "fingerprint": "fp-classify-sentiment",
+          "inputTokens": 220,
+          "outputTokens": 6,
+          "cacheable": false,
+          "occurrences": 52000
+        }
+      ]
+    },
+    {
+      "id": "weekly-report-generator",
+      "team": "data",
+      "accountId": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-ai-prod/providers/Microsoft.CognitiveServices/accounts/aoai-contoso-eastus",
+      "deployment": "gpt-4o",
+      "task": "weekly business report drafting",
+      "requests": 120,
+      "inputTokens": 72000,
+      "outputTokens": 108000,
+      "cacheHits": 0,
+      "repeatablePromptShare": 0.0,
+      "repeatedContextTokens": 0,
+      "maxTokensConfigured": 4096,
+      "errors": 96,
+      "retries": 480,
+      "retryBackoffMs": 0,
+      "sampledCalls": [
+        {
+          "fingerprint": "fp-weekly-report",
+          "inputTokens": 600,
+          "outputTokens": 900,
+          "cacheable": false,
+          "occurrences": 120
+        }
+      ]
+    },
+    {
+      "id": "pr-code-review-agent",
+      "team": "platform",
+      "accountId": "/subscriptions/sub-contoso-retail-01/resourceGroups/rg-ai-prod/providers/Microsoft.CognitiveServices/accounts/aoai-contoso-eastus",
+      "deployment": "gpt-4o-mini",
+      "task": "pull-request review comments",
+      "requests": 3100,
+      "inputTokens": 9300000,
+      "outputTokens": 1240000,
+      "cacheHits": 2201,
+      "repeatablePromptShare": 0.75,
+      "repeatedContextTokens": 1200000,
+      "maxTokensConfigured": 800,
+      "errors": 5,
+      "retries": 5,
+      "retryBackoffMs": 1000,
+      "sampledCalls": [
+        {
+          "fingerprint": "fp-pr-diff-review",
+          "inputTokens": 3000,
+          "outputTokens": 400,
+          "cacheable": true,
+          "occurrences": 3100
+        }
+      ]
+    }
+  ],
+  "collaboration": {
+    "source": "Microsoft 365 tenant linked to the subscription (synthetic)",
+    "storageRegion": "northeurope",
+    "redundancy": "GRS",
+    "recordings": [
+      {
+        "id": "rec-001",
+        "team": "corp-it",
+        "meeting": "All-Hands 2026-01",
+        "sizeGb": 3.2,
+        "ageDays": 250,
+        "retentionDays": 400,
+        "views30d": 0,
+        "hasTranscript": true,
+        "aiSummaries": 1
+      },
+      {
+        "id": "rec-002",
+        "team": "corp-it",
+        "meeting": "All-Hands 2026-01",
+        "sizeGb": 3.2,
+        "ageDays": 250,
+        "retentionDays": 400,
+        "views30d": 0,
+        "duplicateOf": "rec-001",
+        "hasTranscript": true,
+        "aiSummaries": 1
+      },
+      {
+        "id": "rec-003",
+        "team": "commerce",
+        "meeting": "Standup 2026-09-29",
+        "sizeGb": 0.4,
+        "ageDays": 7,
+        "retentionDays": 30,
+        "views30d": 4,
+        "hasTranscript": false,
+        "aiSummaries": 1
+      },
+      {
+        "id": "rec-004",
+        "team": "corp-it",
+        "meeting": "Board Review 2025-Q4",
+        "sizeGb": 5.0,
+        "ageDays": 280,
+        "retentionDays": 730,
+        "views30d": 1,
+        "hasTranscript": true,
+        "aiSummaries": 3,
+        "complianceHold": true
+      }
+    ]
+  }
+}

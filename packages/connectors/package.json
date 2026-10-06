@@ -1,0 +1,20 @@
+{
+  "name": "@codevitals/connectors",
+  "version": "0.14.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@codevitals/core": "workspace:*",
+    "@codevitals/git": "workspace:*",
+    "@codevitals/graph": "workspace:*",
+    "@codevitals/review": "workspace:*",
+    "@greenops/agent": "workspace:*",
+    "@greenops/detect": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint \"src/**/*.ts\""
+  }
+}

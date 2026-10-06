@@ -1,0 +1,8 @@
+{
+  "stack": "patagonia-infra",
+  "resources": [
+    { "name": "web-vmss", "type": "vm_scale_set", "region": "eastus", "gridIntensityKgPerKwh": 0.45, "instanceCores": 16, "neededCores": 6, "autoscale": false },
+    { "name": "worker-pool", "type": "aks_nodepool", "region": "germanywestcentral", "gridIntensityKgPerKwh": 0.30, "instanceCores": 8, "neededCores": 8, "autoscale": true },
+    { "name": "reporting-vm", "type": "virtual_machine", "region": "southafricanorth", "gridIntensityKgPerKwh": 0.70, "instanceCores": 4, "neededCores": 4, "autoscale": false }
+  ]
+}

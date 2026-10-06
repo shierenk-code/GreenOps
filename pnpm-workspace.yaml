@@ -1,0 +1,14 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+allowBuilds:
+  esbuild: true
+  tree-sitter: true
+  tree-sitter-javascript: true
+  tree-sitter-typescript: true
+  tree-sitter-python: true
+  tree-sitter-go: true
+  tree-sitter-java: true
+minimumReleaseAge: 1440
+patchedDependencies:
+  braces@3.0.3: patches/braces@3.0.3.patch

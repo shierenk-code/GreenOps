@@ -1,0 +1,87 @@
+.account {
+  background: #19191c;
+  color: #fafaf8;
+  padding: 14px 24px;
+  font: 12px/1.6 var(--go-sans);
+}
+.bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+.account button,
+.account select {
+  padding: 8px 12px;
+  border: 1px solid #777;
+  background: #29292c;
+  color: white;
+  font: inherit;
+}
+.account select {
+  max-width: min(450px, 85vw);
+}
+.account a {
+  color: #ffb000;
+}
+.account li {
+  padding: 8px 0;
+}
+.connection {
+  padding: 15px 0;
+  max-width: 1000px;
+}
+.connection > code {
+  display: block;
+  padding: 15px;
+  border: 1px solid #666;
+  overflow-wrap: anywhere;
+  margin: 12px 0;
+}
+.connection p {
+  margin-top: 12px;
+}
+.login {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #fafaf8;
+  color: #19191c;
+}
+.form {
+  width: 100%;
+  max-width: 440px;
+  border: 1px solid #deded9;
+  padding: 35px;
+}
+.form h1 {
+  font-size: 36px;
+  letter-spacing: -1.5px;
+  margin-bottom: 15px;
+}
+.form p {
+  margin: 15px 0;
+  font-size: 13px;
+}
+.form label {
+  display: block;
+  margin: 20px 0;
+}
+.form input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #bbb;
+  margin-top: 5px;
+}
+.form button {
+  width: 100%;
+  padding: 13px;
+  margin-top: 12px;
+  background: #19191c;
+  color: white;
+}
+.form button:disabled {
+  opacity: 0.5;
+}

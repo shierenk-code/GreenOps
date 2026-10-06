@@ -1,0 +1,9 @@
+{
+  "tenant": "acme-collab",
+  "recordings": [
+    { "id": "rec-001", "meeting": "All-Hands 2026-01", "sizeGb": 3.2, "retentionDays": 400, "hasTranscript": true },
+    { "id": "rec-002", "meeting": "All-Hands 2026-01", "sizeGb": 3.2, "retentionDays": 400, "duplicateOf": "rec-001", "hasTranscript": true },
+    { "id": "rec-003", "meeting": "Standup 2026-09-29", "sizeGb": 0.4, "retentionDays": 30, "hasTranscript": false },
+    { "id": "rec-004", "meeting": "Board Review 2025-Q4", "sizeGb": 5.0, "retentionDays": 730, "hasTranscript": true }
+  ]
+}

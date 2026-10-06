@@ -1,0 +1,22 @@
+{
+  "cluster": "prod-aks-eastus",
+  "pods": [
+    { "name": "api-gateway", "requestedCpuCores": 4, "usedCpuCores": 0.6, "replicas": 6 },
+    { "name": "batch-worker", "requestedCpuCores": 8, "usedCpuCores": 1.2, "replicas": 3 },
+    { "name": "auth-service", "requestedCpuCores": 2, "usedCpuCores": 1.5, "replicas": 2 }
+  ],
+  "volumes": [
+    { "name": "pvc-legacy-migration", "gb": 250, "attached": false },
+    { "name": "pvc-scratch-01", "gb": 40, "attached": false },
+    { "name": "pvc-active-db", "gb": 100, "attached": true }
+  ],
+  "images": [
+    { "name": "api-gateway:latest", "sizeMb": 2400 },
+    { "name": "batch-worker:latest", "sizeMb": 950 },
+    { "name": "auth-service:slim", "sizeMb": 180 }
+  ],
+  "logs": [
+    { "name": "api-gateway-debug", "gbPerDay": 12, "retentionDays": 90 },
+    { "name": "audit-trail", "gbPerDay": 1, "retentionDays": 365 }
+  ]
+}

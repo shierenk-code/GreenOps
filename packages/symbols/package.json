@@ -1,0 +1,16 @@
+{
+  "name": "@codevitals/symbols",
+  "version": "0.14.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@codevitals/ast": "workspace:*",
+    "@codevitals/core": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint \"src/**/*.ts\""
+  }
+}

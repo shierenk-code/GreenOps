@@ -1,0 +1,30 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "references": [
+    { "path": "../../packages/errors" },
+    { "path": "../../packages/logger" },
+    { "path": "../../packages/core" },
+    { "path": "../../packages/config" },
+    { "path": "../../packages/filesystem" },
+    { "path": "../../packages/repository" },
+    { "path": "../../packages/ast" },
+    { "path": "../../packages/parser" },
+    { "path": "../../packages/symbols" },
+    { "path": "../../packages/references" },
+    { "path": "../../packages/graph" },
+    { "path": "../../packages/git" },
+    { "path": "../../packages/review" },
+    { "path": "../../packages/connectors" },
+    { "path": "../../packages/github-app" },
+    { "path": "../../packages/measure" },
+    { "path": "../../packages/ledger" },
+    { "path": "../../packages/detect" },
+    { "path": "../../packages/agent" },
+    { "path": "../../packages/agents" }
+  ],
+  "include": ["src/**/*"]
+}

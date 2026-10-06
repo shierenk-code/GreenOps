@@ -1,0 +1,19 @@
+{
+  "name": "@greenops/agent",
+  "version": "0.14.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@greenops/detect": "workspace:*",
+    "@greenops/ledger": "workspace:*",
+    "@greenops/measure": "workspace:*",
+    "openai": "^7.25.0",
+    "picocolors": "^1.0.1"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint \"src/**/*.ts\""
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@greenops/detect",
+  "version": "0.14.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@codevitals/repository": "workspace:*",
+    "@codevitals/symbols": "workspace:*",
+    "@codevitals/references": "workspace:*",
+    "@codevitals/graph": "workspace:*",
+    "@greenops/measure": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint \"src/**/*.ts\""
+  }
+}

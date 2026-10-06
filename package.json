@@ -1,0 +1,43 @@
+{
+  "name": "greenops-monorepo",
+  "private": true,
+  "version": "0.14.0",
+  "packageManager": "pnpm@11.17.0",
+  "description": "GreenOps Digital Sustainability Control Plane",
+  "scripts": {
+    "build": "turbo run build",
+    "test": "vitest run",
+    "test:all": "vitest run && pnpm --filter codevitals-mcp test",
+    "test:watch": "vitest",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,js,json,md,yaml,yml}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,json,md,yaml,yml}\"",
+    "codevitals": "pnpm --filter codevitals run dev",
+    "greenops": "pnpm --filter codevitals run greenops",
+    "greenops:install": "node scripts/install-greenops-cli.mjs",
+    "commitlint": "commitlint --from=HEAD~1",
+    "version:check": "node scripts/version.mjs check",
+    "version:bump": "node scripts/version.mjs",
+    "version:patch": "node scripts/version.mjs patch",
+    "version:minor": "node scripts/version.mjs minor",
+    "version:major": "node scripts/version.mjs major",
+    "prepare": "husky && node scripts/patch-braces.cjs"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "@types/node": "^20.14.10",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^8.57.0",
+    "husky": "^9.1.7",
+    "prettier": "^3.3.3",
+    "turbo": "^2.0.14",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
+  },
+  "engines": {
+    "node": "^22.12.0 || >=24.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "workload": "nightly-etl",
+  "intervalMinutes": 60,
+  "samples": [
+    { "timestamp": "2026-09-29T00:00Z", "energyKwh": 0.40 },
+    { "timestamp": "2026-09-29T01:00Z", "energyKwh": 0.42 },
+    { "timestamp": "2026-09-29T02:00Z", "energyKwh": 0.38 },
+    { "timestamp": "2026-09-29T03:00Z", "energyKwh": 2.10 },
+    { "timestamp": "2026-09-29T04:00Z", "energyKwh": 0.41 },
+    { "timestamp": "2026-09-29T05:00Z", "energyKwh": 0.39 },
+    { "timestamp": "2026-09-29T06:00Z", "energyKwh": 3.60 },
+    { "timestamp": "2026-09-29T07:00Z", "energyKwh": 0.40 }
+  ]
+}

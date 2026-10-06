@@ -1,0 +1,40 @@
+name: Build GreenOps web deployment
+on:
+  workflow_dispatch:
+  push:
+    branches: [greenops-init]
+    paths:
+      - 'apps/CodeVitals-MCP/website/**'
+      - 'packages/**'
+      - '.github/workflows/website-artifact.yml'
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.17.0
+      - run: pnpm install --frozen-lockfile
+      - run: npm ci --prefix apps/CodeVitals-MCP/website
+      - name: Test account isolation and terminal synchronization
+        run: pnpm exec vitest run tests/cloud-backend.integration.test.ts
+        env:
+          GREENOPS_RUN_DB_TESTS: '1'
+      - name: Build and package
+        working-directory: apps/CodeVitals-MCP/website
+        run: |
+          npm run build -- --webpack
+          node scripts/package-cloud.mjs
+          cd dist/cloud
+          zip -qr ../greenops-web.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: greenops-web-linux
+          path: apps/CodeVitals-MCP/website/dist/greenops-web.zip
+          retention-days: 7

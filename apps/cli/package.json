@@ -1,0 +1,44 @@
+{
+  "name": "codevitals",
+  "version": "0.14.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "greenops": "./dist/greenops-cli.js",
+    "codevitals": "./dist/cli.js"
+  },
+  "main": "./dist/cli.js",
+  "types": "./dist/cli.d.ts",
+  "dependencies": {
+    "@codevitals/config": "workspace:*",
+    "@codevitals/connectors": "workspace:*",
+    "@codevitals/core": "workspace:*",
+    "@codevitals/errors": "workspace:*",
+    "@codevitals/filesystem": "workspace:*",
+    "@codevitals/git": "workspace:*",
+    "@codevitals/github-app": "workspace:*",
+    "@codevitals/graph": "workspace:*",
+    "@codevitals/logger": "workspace:*",
+    "@codevitals/parser": "workspace:*",
+    "@codevitals/references": "workspace:*",
+    "@codevitals/repository": "workspace:*",
+    "@codevitals/review": "workspace:*",
+    "@codevitals/symbols": "workspace:*",
+    "@greenops/measure": "workspace:*",
+    "@greenops/ledger": "workspace:*",
+    "@greenops/detect": "workspace:*",
+    "@greenops/agent": "workspace:*",
+    "@greenops/agents": "workspace:*",
+    "commander": "^15.0.0",
+    "picocolors": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsc -b && node ./dist/cli.js",
+    "greenops": "tsc -b && node ./dist/greenops-cli.js",
+    "lint": "eslint \"src/**/*.ts\""
+  }
+}

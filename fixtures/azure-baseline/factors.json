@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "note": "Conversion factors for the GreenOps translation engine. Every factor states its kind (measured | modeled | synthetic) and source. Starting values must be verified against the cited source before being presented as anything other than an illustration.",
+  "grid": {
+    "eastus": {
+      "gCo2PerKwh": 380,
+      "kind": "synthetic",
+      "source": "Illustrative annual-average location-based value for the demo. Replace with a cited annual average (e.g. Ember or Electricity Maps) for the grid serving this Azure region."
+    },
+    "northeurope": {
+      "gCo2PerKwh": 290,
+      "kind": "synthetic",
+      "source": "Illustrative annual-average location-based value for the demo. Replace with a cited annual average for the grid serving this Azure region."
+    },
+    "centralindia": {
+      "gCo2PerKwh": 680,
+      "kind": "synthetic",
+      "source": "Illustrative annual-average location-based value for the demo. Replace with a cited annual average for the grid serving this Azure region."
+    },
+    "swedencentral": {
+      "gCo2PerKwh": 45,
+      "kind": "synthetic",
+      "source": "Illustrative low-carbon comparison region (not used by the subscription). Replace with a cited annual average."
+    }
+  },
+  "pue": {
+    "value": 1.185,
+    "kind": "modeled",
+    "source": "Starting value from the Cloud Carbon Footprint methodology (Azure). Verify at https://www.cloudcarbonfootprint.org/docs/methodology before use."
+  },
+  "compute": {
+    "minWattsPerVCpu": 0.78,
+    "maxWattsPerVCpu": 3.76,
+    "memoryWattsPerGb": 0.392,
+    "kind": "modeled",
+    "source": "Starting values from the Cloud Carbon Footprint methodology (Azure average min/max watts per vCPU; memory coefficient). Verify before use."
+  },
+  "storage": {
+    "ssdWhPerTbHour": 1.2,
+    "hddWhPerTbHour": 0.65,
+    "replicationFactor": { "LRS": 3, "ZRS": 3, "GRS": 6, "RAGRS": 6 },
+    "kind": "modeled",
+    "source": "Starting values from the Cloud Carbon Footprint methodology (storage coefficients and replication factors). Verify before use."
+  },
+  "embodied": {
+    "hostKgCo2e": 1200,
+    "hostVCpu": 48,
+    "hostLifetimeHours": 35040,
+    "kind": "modeled",
+    "source": "Order-of-magnitude server manufacturing footprint over a 4-year life, in the style of the Cloud Carbon Footprint embodied-emissions method. Verify before use."
+  },
+  "ai": {
+    "whPer1kTokens": { "small": 0.04, "medium": 0.12, "large": 0.3 },
+    "kind": "modeled",
+    "source": "Order-of-magnitude inference energy by model size from published studies (e.g. Luccioni et al. 2023). Providers do not publish per-token energy; treat as a wide-uncertainty estimate."
+  },
+  "pipeline": {
+    "cacheMissExtraShare": 0.4,
+    "kind": "synthetic",
+    "source": "Illustrative assumption: a dependency-cache miss adds about 40% to a run's duration. Replace with measured cached vs uncached run durations for the pipeline."
+  },
+  "modelTiers": {
+    "gpt-4o": "large",
+    "gpt-4o-mini": "small"
+  },
+  "skus": {
+    "Standard_B2s": { "vCpu": 2, "memoryGb": 4 },
+    "Standard_B2ms": { "vCpu": 2, "memoryGb": 8 },
+    "Standard_D2s_v5": { "vCpu": 2, "memoryGb": 8 },
+    "Standard_D4s_v5": { "vCpu": 4, "memoryGb": 16 },
+    "Standard_D8s_v5": { "vCpu": 8, "memoryGb": 32 },
+    "Standard_E8s_v5": { "vCpu": 8, "memoryGb": 64 },
+    "P1v3": { "vCpu": 2, "memoryGb": 8 },
+    "P2v3": { "vCpu": 4, "memoryGb": 16 },
+    "P3v3": { "vCpu": 8, "memoryGb": 32 },
+    "Hosted-Ubuntu-2core": { "vCpu": 2, "memoryGb": 7 },
+    "Hosted-Ubuntu-4core": { "vCpu": 4, "memoryGb": 16 }
+  }
+}

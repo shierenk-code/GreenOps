@@ -1,0 +1,36 @@
+# Node dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+lib/
+*.tsbuildinfo
+.turbo/
+
+# Test & coverage
+coverage/
+.vitest/
+
+# Temp & cache
+.cache/
+.tmp/
+*.log
+
+# Generated GreenOps run artifacts (may contain local absolute paths)
+greenops-ledger.json
+greenops-fleet-ledger.json
+ledger-*.json
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# OS & IDE
+.DS_Store
+.vscode/
+.idea/

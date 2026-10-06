@@ -1,0 +1,19 @@
+{
+  "server": {
+    "name": "greenops-mcp",
+    "version": "1.0.0",
+    "timeoutMs": 60000,
+    "maxFileSizeBytes": 52428800,
+    "maxRecursionDepth": 15
+  },
+  "defaults": {
+    "depth": "medium",
+    "excludePatterns": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.git/**",
+      "**/coverage/**"
+    ]
+  }
+}

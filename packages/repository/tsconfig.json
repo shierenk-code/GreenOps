@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "references": [
+    { "path": "../errors" },
+    { "path": "../logger" },
+    { "path": "../core" },
+    { "path": "../config" },
+    { "path": "../filesystem" },
+    { "path": "../ast" },
+    { "path": "../parser" },
+    { "path": "../symbols" },
+    { "path": "../references" },
+    { "path": "../graph" },
+    { "path": "../git" }
+  ],
+  "include": ["src/**/*"]
+}
