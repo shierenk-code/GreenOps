@@ -1,5 +1,7 @@
 # GreenOps dashboard
 
+Use **Review your architecture / connect Azure** for the new [data setup guide](../../../docs/development/bring-your-own-data.md). Findings shows detected issues; Recommendations shows proposed actions. Same-specialist section changes preserve scroll. Signed-in users sync ledgers rather than using local file import.
+
 Next.js 16 / React 19 UI for saved analysis, human plan review and isolated demonstrations.
 
 For installation, use the [root quick start](../../../README.md#quick-start). For MongoDB accounts and terminal sync, use the [connected workspace guide](../../../docs/cloud-dashboard.md).
@@ -46,7 +48,11 @@ Account reviews use the signed-in identity. Local reviews use a self-declared re
 
 ## Map and charts
 
-**Carbon by region** shows explicit supported locations only. Selecting a pin or ranked region updates its resource links. Grid intensity (g CO₂e/kWh) is not total workload emissions. Proposed routes are optional; missing intensity remains unknown.
+**Carbon by region** shows explicit supported locations only. Selecting a pin or ranked region updates its resource links. On Carbon and Architecture specialist pages, it also filters the summary, findings, results and source inventory. Use **All regions** or **Clear region filter** to reset. Overview's map remains a regional explorer and does not change whole-run totals. Grid intensity (g CO₂e/kWh) is not total workload emissions.
+
+**AI Efficiency** shows known workload request counts (deduplicated within an explicit application scope), the largest standalone token opportunity, awaiting reviews and passed checks. The application chart takes the largest option per scope to avoid adding overlapping recommendations. These are finding-scoped estimates, not a complete request inventory or achieved savings. Unknowns remain **Not available**; unused output allowance is never counted as avoided tokens.
+
+**Where your decisions stand** separates approved-but-not-applied plans, applied changes awaiting checks, and passed checks. Selecting a state filters the findings list. Its estimated-benefit column shows recorded token/energy opportunities or explicitly illustrative sample amounts. The AI **Before & after** panel links to the recorded results; separate sandbox results are never imported into those counts.
 
 The map uses bundled Natural Earth data, not a paid map service. Charts include point inspection and exact-value tables. Motion respects reduced-motion preferences. The theme picker is removed; compatibility theme keys remain.
 

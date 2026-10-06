@@ -72,6 +72,8 @@ The shared workflow detects, investigates, compares options, estimates impact, r
 
 ## Data and model
 
+To assess your own architecture or a permitted Azure test subscription, use [Bring your own data](docs/development/bring-your-own-data.md). Azure coverage currently checks VM scale-set autoscale configuration only—not a full subscription baseline.
+
 - **Main dataset:** [Azure subscription fixtures](fixtures/azure-baseline), an explicitly synthetic subscription with teams, resources and factors. Expected counts: Waste 13, AI 5, Pipeline 4, DR 3, Carbon 2, Architecture 2, Collaboration 2.
 - **Other samples:** [source-code demo](fixtures/greenops-sample), [legacy fleet fixtures](fixtures/greenops-mock), dashboard Sample scenarios and isolated cache/Waste demos. These are separate datasets.
 - **Google Gemini:** optional model-assisted analysis. Configure a private key/model, then use `--provider gemini`; see [Gemini setup](docs/development/getting-started.md#google-gemini). Provider failure is labelled fallback, not successful AI output.
@@ -99,11 +101,3 @@ The shared workflow detects, investigates, compares options, estimates impact, r
 | CLI commands / GitHub integration                | [CLI reference](docs/cli/README.md) · [GitHub setup](docs/github-app-setup.md) |
 | Verified checks and submission gaps              | [Submission status](docs/SUBMISSION.md)                                        |
 | Dependency mitigations and secrets               | [Security](SECURITY.md)                                                        |
-
-## Component origin and third-party dependencies
-
-GreenOps includes pre-existing **CodeVitals repository-analysis and MCP components**. Internal `@codevitals/*` names and `apps/CodeVitals-MCP` paths remain for compatibility; rebranding does not make those components new work.
-
-Third-party dependencies include Next.js, React, TypeScript, the MCP SDK and MongoDB's driver, as declared in manifests and lockfiles. Their licenses/notices remain applicable. The regional map uses bundled Natural Earth data. Before submission, identify the pre-hackathon baseline and work completed during the event.
-
-Implementation and documentation reviewed on **6 October 2026**. Use the submission branch and check the remaining items in [submission status](docs/SUBMISSION.md).

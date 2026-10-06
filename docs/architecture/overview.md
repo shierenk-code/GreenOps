@@ -4,6 +4,8 @@ Implementation reference, reviewed 6 October 2026. Start with the [quick start](
 
 ## System boundaries
 
+Update, 7 October 2026: [Bring your own data](../development/bring-your-own-data.md) adds validated architecture JSON assessment and a bounded read-only Azure CLI adapter for VM scale sets/autoscale settings. Both emit standard review ledgers with execution withheld. This does not implement full subscription telemetry or browser Azure OAuth.
+
 GreenOps is a TypeScript monorepo with a CLI, repository analysis, seven specialist detectors, optional Gemini reasoning, evidence storage and a Next.js dashboard.
 
 There are three distinct paths:

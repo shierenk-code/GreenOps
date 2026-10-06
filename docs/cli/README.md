@@ -8,6 +8,8 @@ pnpm.cmd greenops <command> --help
 
 ## Common commands
 
+Read-only entry points: `architecture assess <file> --ledger <file>` and `azure scan --subscription <UUID> --ledger <file>`. See [inputs, permissions and dashboard sync](../development/bring-your-own-data.md). Both withhold execution and use deterministic reasoning.
+
 | Command                                                 | Purpose                                                                              |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | `run <path> --fleet --provider offline --ledger <file>` | Seven-specialist assessment of supplied records without model calls                  |

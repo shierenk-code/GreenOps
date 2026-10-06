@@ -6,6 +6,15 @@
   margin: auto;
   min-width: 0;
 }
+.recommendations { display: grid; gap: 18px; }
+.recommendations > article { padding: 20px; border: 1px solid var(--cp-border); }
+.recommendations .heading { padding: 0; border: 0; }
+.recommendations h4 { margin: 8px 0; font-size: 20px; }
+.recommendations details { margin: 14px 0; }
+.recommendations .button { margin-top: 12px; }
+.command { padding: 16px; background: var(--cp-soft); white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; line-height: 1.7; }
+.card input { max-width: 100%; padding: 10px; border: 1px solid var(--cp-border); color: var(--cp-text); background: var(--cp-surface); }
+.textButton:disabled { opacity: .5; cursor: not-allowed; }
 .comparison {
   margin: 0;
   padding: 20px;
@@ -100,6 +109,7 @@
   line-height: 1.5;
 }
 .summary strong {
+  overflow-wrap: anywhere;
   font-family: var(--go-display);
   font-weight: 400;
   font-size: 30px;
@@ -292,7 +302,70 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
   font-size: 13px;
+}
+.progress {
+  padding: 22px;
+  border: 1px solid var(--cp-border);
+  border-left: 3px solid var(--cp-accent);
+  background: var(--cp-surface);
+  min-width: 0;
+}
+.progress h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+.progress p,
+.progress small {
+  color: var(--cp-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.progressSteps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+.progressSteps button {
+  display: grid;
+  gap: 6px;
+  text-align: left;
+  padding: 16px;
+  cursor: pointer;
+  border: 1px solid var(--cp-border);
+  background: var(--cp-bg);
+  color: var(--cp-text);
+  font: inherit;
+}
+.progressSteps strong {
+  font-size: 28px;
+  color: var(--cp-accent);
+}
+.progressSteps span {
+  font-size: 13px;
+  font-weight: 600;
+}
+.progressSteps button[aria-pressed='true'] {
+  border-color: var(--cp-accent);
+  box-shadow: inset 0 0 0 1px var(--cp-accent);
+}
+.progressSteps button:focus-visible {
+  outline: 2px solid var(--cp-accent);
+  outline-offset: 3px;
+}
+@media (max-width: 560px) {
+  .progressSteps {
+    grid-template-columns: 1fr;
+  }
+  .progressSteps button {
+    grid-template-columns: 44px 1fr;
+    align-items: center;
+  }
+  .progressSteps small {
+    grid-column: 2;
+  }
 }
 .srOnly {
   position: absolute;

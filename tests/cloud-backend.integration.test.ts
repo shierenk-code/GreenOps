@@ -348,7 +348,12 @@ suite('authenticated cloud backend against MongoDB', () => {
       await writeFile(file, JSON.stringify(cliLedger));
       const credentialsPath = join(directory, 'credentials.json');
       const credentials = JSON.parse(await readFile(credentialsPath, 'utf8'));
-      expect((await stat(credentialsPath)).mode & 0o777).toBe(0o600);
+      const credentialFile = await stat(credentialsPath);
+      expect(credentialFile.isFile()).toBe(true);
+      // Windows exposes synthesized POSIX mode bits; this is not an ACL check.
+      // Enforce POSIX permissions where supported, while keeping sync/rotation
+      // coverage runnable on Windows. Windows ACL privacy needs a separate audit.
+      if (process.platform !== 'win32') expect(credentialFile.mode & 0o777).toBe(0o600);
       await writeFile(credentialsPath, JSON.stringify({ ...credentials, expiresAt: 0 }));
       expect(await syncLedger(file, 'cli-fixture')).toBe(1);
       const rotated = JSON.parse(await readFile(credentialsPath, 'utf8'));

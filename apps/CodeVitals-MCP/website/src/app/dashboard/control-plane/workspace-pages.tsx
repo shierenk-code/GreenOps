@@ -8,6 +8,8 @@ import { TAB_LABELS } from './types';
 import { filterOpportunities, LedgerPage } from './audit-pages';
 import { Chart, Empty, MetricGrid, StatusBadge } from './ui';
 import { CarbonAtlas } from './carbon-atlas';
+import { carbonObservations } from './carbon-map-data';
+import { aiInsights, benefitFor, displayQuantity, statusLabel } from './agent-insights';
 import { ResourceSummary } from './resource-summary';
 import DemoClient from '../ai-efficiency-demo/demo-client';
 import WasteWorkflowClient from '../digital-waste/workflow-client';
@@ -32,9 +34,19 @@ export function FindingList({
   recommendations = false,
   initialQuery = '',
   compact = false,
-}: PageProps & { recommendations?: boolean; initialQuery?: string; compact?: boolean }) {
+  statusFilter,
+  onStatusChange,
+}: PageProps & {
+  recommendations?: boolean;
+  initialQuery?: string;
+  compact?: boolean;
+  statusFilter?: string;
+  onStatusChange?: (status: string) => void;
+}) {
   const [query, setQuery] = useState(initialQuery);
-  const [status, setStatus] = useState('all');
+  const [localStatus, setLocalStatus] = useState('all');
+  const status = statusFilter ?? localStatus;
+  const setStatus = onStatusChange ?? setLocalStatus;
   const [showAll, setShowAll] = useState(false);
   const shown = filterOpportunities(data.opportunities, query, status);
   const visible = compact && !showAll && !query && status === 'all' ? shown.slice(0, 3) : shown;
@@ -85,6 +97,7 @@ export function FindingList({
               <tr>
                 <th>Resource</th>
                 <th>{recommendations ? 'Proposed change' : 'Finding'}</th>
+                <th>Estimated benefit</th>
                 <th>Status / risk</th>
                 <th>Action</th>
               </tr>
@@ -97,11 +110,16 @@ export function FindingList({
                     <small>{TAB_LABELS[item.agentKey]}</small>
                   </th>
                   <td>
-                    <strong>{item.title}</strong>
+                    <strong>{recommendations ? item.title : item.description}</strong>
                     {!compact && <p>{recommendations ? item.recommendation : item.description}</p>}
                   </td>
                   <td>
-                    <StatusBadge status={item.status} />
+                    <strong>{benefitFor(item).value}</strong>
+                    <small>{benefitFor(item).label}</small>
+                  </td>
+                  <td>
+                    <StatusBadge status={statusLabel(item.status)} />
+                    {item.status === 'approved' && <small>Not applied · not verified</small>}
                     <small>
                       {item.risk === 'Unknown' ? 'Risk not assessed' : `${item.risk} risk`}
                     </small>
@@ -112,7 +130,8 @@ export function FindingList({
                       onClick={() => onReview(item.id)}
                       aria-label={`Open ${item.title} for ${item.target}`}
                     >
-                      Open <ArrowRight size={14} aria-hidden="true" />
+                      {isPending(item) ? 'Review' : 'View decision'}{' '}
+                      <ArrowRight size={14} aria-hidden="true" />
                     </button>
                   </td>
                 </tr>
@@ -129,6 +148,26 @@ export function FindingList({
       )}
     </section>
   );
+}
+
+export function RecommendationList({ data, onReview }: PageProps) {
+  const [showAll, setShowAll] = useState(false);
+  const items = [...data.opportunities.filter(isPending), ...data.opportunities.filter((item) => !isPending(item))];
+  const visible = showAll ? items : items.slice(0, 3);
+  return <section className={styles.card} aria-label="Recommended changes">
+    <h3>Recommended changes</h3>
+    <p>What to change and why. Review a plan before applying anything; approval alone does not pass a change check.</p>
+    {!items.length ? <Empty>No recommendations in this selection. Check the run, date window and region filter.</Empty> :
+      <div className={styles.recommendations}>{visible.map((item) => <article key={item.id}>
+        <div className={styles.heading}><div><span className={styles.eyebrow}>{item.target}</span><h4>{item.title}</h4></div><StatusBadge status={statusLabel(item.status)} /></div>
+        <p>{item.recommendation}</p>
+        <dl><div><dt>Estimated benefit</dt><dd>{benefitFor(item).value} · {benefitFor(item).label}</dd></div>
+          <div><dt>Before applying</dt><dd>{item.riskNote}</dd></div></dl>
+        <details><summary>Why this change?</summary><p>{item.description}</p></details>
+        <button type="button" className={styles.button} onClick={() => onReview(item.id)}>{isPending(item) ? 'Review plan' : 'View decision'} <ArrowRight size={14} aria-hidden="true" /></button>
+      </article>)}</div>}
+    {items.length > 3 && <button type="button" className={styles.textButton} onClick={() => setShowAll(!showAll)}>{showAll ? 'Show priority recommendations' : `View all ${items.length} recommendations`}</button>}
+  </section>;
 }
 
 export function ResultsPage({
@@ -284,7 +323,26 @@ export function SpecialistWorkspace({
   onNavigate,
 }: PageProps &
   Navigation & { agent: AgentWorkspace; section: WorkspaceSection; sandbox: boolean }) {
-  const opportunities = data.opportunities.filter((o) => o.agentKey === agent.key);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [region, setRegion] = useState<string | null>(null);
+  const allOpportunities = data.opportunities.filter((o) => o.agentKey === agent.key);
+  const mapData = { ...data, opportunities: allOpportunities, agents: [agent] };
+  const observations = carbonObservations(mapData).observations;
+  const activeRegion = observations.find((item) => item.region.id === region)?.region;
+  const regionalIds = new Set(
+    observations
+      .filter((item) => item.region.id === activeRegion?.id)
+      .map((item) => item.findingId),
+  );
+  const opportunities = activeRegion
+    ? allOpportunities.filter((item) => regionalIds.has(item.id))
+    : allOpportunities;
+  const ai = agent.key === 'ai' ? aiInsights(opportunities) : null;
+  const approved = opportunities.filter((item) => item.status === 'approved').length;
+  const applied =
+    data.mode === 'sample' ? 0 : opportunities.filter((item) => item.status === 'applied').length;
+  const verified =
+    data.mode === 'sample' ? 0 : opportunities.filter((item) => item.status === 'verified').length;
   const ids = new Set(opportunities.map((o) => o.id));
   const scoped = {
     ...data,
@@ -319,14 +377,22 @@ export function SpecialistWorkspace({
       </header>
       <div className={styles.summary}>
         <article>
-          <span>Resources with findings</span>
-          <strong>{new Set(opportunities.map((item) => item.target)).size}</strong>
-          <small>In this selection</small>
+          <span>{ai ? 'Requests analysed' : 'Resources with findings'}</span>
+          <strong className={ai?.requests === null ? styles.unknown : undefined}>
+            {ai
+              ? displayQuantity(ai.requests)
+              : new Set(opportunities.map((item) => item.target)).size}
+          </strong>
+          <small>{ai ? `Known workload subtotal · ${ai.coverage}` : 'In this selection'}</small>
         </article>
         <article>
-          <span>Findings</span>
-          <strong>{opportunities.length}</strong>
-          <small>Detected opportunities</small>
+          <span>{ai ? 'Potentially avoidable tokens' : 'Findings'}</span>
+          <strong className={ai?.largestOpportunity === null ? styles.unknown : undefined}>
+            {ai ? displayQuantity(ai.largestOpportunity) : opportunities.length}
+          </strong>
+          <small>
+            {ai ? 'Largest single opportunity · not a combined total' : 'Detected opportunities'}
+          </small>
         </article>
         <article>
           <span>Awaiting review</span>
@@ -347,14 +413,81 @@ export function SpecialistWorkspace({
           </small>
         </article>
       </div>
+      <section className={styles.progress} aria-label="Decision and execution progress">
+        <div>
+          <h3>Where your decisions stand</h3>
+          <p>
+            {data.mode === 'sample'
+              ? 'Simulated reviews only. No real workload changes.'
+              : 'Approval records a plan. Applying it and checking the result are separate steps.'}
+          </p>
+        </div>
+        <div className={styles.progressSteps}>
+          {[
+            {
+              status: 'approved',
+              count: approved,
+              label: 'Plan approved',
+              detail: 'Not applied · not verified',
+            },
+            {
+              status: 'applied',
+              count: applied,
+              label: 'Applied',
+              detail: 'Follow-up check still needed',
+            },
+            {
+              status: 'verified',
+              count: verified,
+              label: 'Check passed',
+              detail: 'Not proof of carbon savings',
+            },
+          ].map((step) => (
+            <button
+              key={step.status}
+              type="button"
+              aria-pressed={statusFilter === step.status}
+              onClick={() => {
+                setStatusFilter(statusFilter === step.status ? 'all' : step.status);
+                if (section !== 'findings' || sandbox) window.history.pushState(null, '', href(agent.key, { section: 'findings' }));
+              }}
+            >
+              <strong>{step.count}</strong>
+              <span>{step.label}</span>
+              <small>{step.detail}</small>
+            </button>
+          ))}
+        </div>
+        <small>
+          Separate current states, not cumulative totals. Select a state to filter the findings
+          below.
+        </small>
+      </section>
       {!sandbox && (agent.key === 'carbon' || agent.key === 'arch') && (
-        <CarbonAtlas data={{ ...scoped, agents: [agent] }} href={href} onNavigate={onNavigate} />
+        <CarbonAtlas
+          data={mapData}
+          href={href}
+          onNavigate={onNavigate}
+          selectedRegion={activeRegion?.id ?? null}
+          onRegionChange={setRegion}
+        />
+      )}
+      {activeRegion && (
+        <div className={styles.notice}>
+          Showing {activeRegion.name}: {opportunities.length} findings. Current or candidate region
+          evidence.
+          <button type="button" className={styles.textButton} onClick={() => setRegion(null)}>
+            Clear region filter
+          </button>
+        </div>
       )}
       <nav className={styles.tabs} aria-label="Agent workspace sections">
         {WORKSPACE_SECTIONS.map((item) => (
           <Link
             key={item}
             href={href(agent.key, { section: item })}
+            scroll={false}
+            data-preserve-scroll="true"
             onClick={onNavigate}
             aria-current={!sandbox && section === item ? 'page' : undefined}
           >
@@ -375,16 +508,36 @@ export function SpecialistWorkspace({
         <ResultsPage data={scoped} onReview={onReview} embedded />
       ) : section === 'activity' ? (
         <ActivityPage data={scoped} onReview={onReview} embedded />
+      ) : section === 'recommendations' ? (
+        <RecommendationList data={scoped} onReview={onReview} />
       ) : (
         <>
           <div className={styles.columns}>
-            {agent.chart ? (
-              <Chart data={agent.chart} kind="bar" />
+            {ai?.chart.points.length || (!ai && agent.chart) ? (
+              <Chart
+                data={
+                  ai
+                    ? ai.chart
+                    : activeRegion
+                      ? {
+                          title: 'Findings in selected region',
+                          description:
+                            'Recorded findings with current or candidate evidence for this region.',
+                          primaryLabel: 'Findings',
+                          primaryUnit: 'findings',
+                          points: opportunities.map((item) => ({ label: item.target, primary: 1 })),
+                        }
+                      : agent.chart!
+                }
+                kind="bar"
+              />
             ) : (
               <section className={styles.card}>
-                <h3>Workload comparison</h3>
+                <h3>{ai ? 'Avoidable tokens by application' : 'Workload comparison'}</h3>
                 <Empty>
-                  No comparable measurements in this selection. Review the findings below.
+                  {ai
+                    ? 'Not available. This selection has no supported token-reduction estimates. Unused token allowance is not a saving.'
+                    : 'No comparable measurements in this selection. Review the findings below.'}
                 </Empty>
               </section>
             )}
@@ -408,18 +561,53 @@ export function SpecialistWorkspace({
                   </>
                 )}
               </section>
+              {ai && (
+                <section className={styles.card} aria-label="Before and after outcome">
+                  <h3>Before &amp; after</h3>
+                  <p>
+                    {verified
+                      ? `${verified} recorded change checks passed. Open Results for the baseline and follow-up evidence.`
+                      : applied
+                        ? 'A change was applied. Follow-up evidence is needed before showing an improvement.'
+                        : approved
+                          ? `${approved} plan(s) approved. No applied change or verified improvement is recorded for those plans.`
+                          : 'No applied change yet. Review a recommendation first.'}
+                  </p>
+                  <Link
+                    className={styles.textButton}
+                    href={href(agent.key, { section: 'results' })}
+                    scroll={false}
+                    data-preserve-scroll="true"
+                    onClick={onNavigate}
+                  >
+                    View recorded results →
+                  </Link>
+                  <p className={styles.caption}>
+                    To try an actual cache change, open the separate sandbox. Its results do not
+                    update this analysis.
+                  </p>
+                </section>
+              )}
             </aside>
           </div>
           <FindingList
             key={`${agent.key}-${section}`}
             data={{ ...scoped, opportunities: attentionFirst }}
             onReview={onReview}
-            recommendations={section === 'recommendations'}
             compact
+            statusFilter={statusFilter}
+            onStatusChange={setStatusFilter}
           />
           <details className={styles.card}>
             <summary>Domain measurements & source inventory</summary>
-            <MetricGrid metrics={agent.metrics} />
+            {activeRegion ? (
+              <p>
+                Region-filtered inventory below. Whole-specialist measurement totals are hidden
+                while a region is selected.
+              </p>
+            ) : (
+              <MetricGrid metrics={agent.metrics} />
+            )}
             <div className={styles.tableScroll}>
               <table>
                 <caption>{agent.inventoryTitle}</caption>
@@ -432,14 +620,16 @@ export function SpecialistWorkspace({
                   </tr>
                 </thead>
                 <tbody>
-                  {agent.rows.map((row) => (
-                    <tr key={row.id}>
-                      <th scope="row">{row.name}</th>
-                      {row.cells.map((cell, i) => (
-                        <td key={i}>{cell}</td>
-                      ))}
-                    </tr>
-                  ))}
+                  {agent.rows
+                    .filter((row) => !activeRegion || regionalIds.has(row.opportunityId ?? row.id))
+                    .map((row) => (
+                      <tr key={row.id}>
+                        <th scope="row">{row.name}</th>
+                        {row.cells.map((cell, i) => (
+                          <td key={i}>{cell}</td>
+                        ))}
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>

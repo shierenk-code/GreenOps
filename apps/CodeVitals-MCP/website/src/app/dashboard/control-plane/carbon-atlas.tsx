@@ -11,15 +11,24 @@ export function CarbonAtlas({
   data,
   href,
   onNavigate,
+  selectedRegion,
+  onRegionChange,
 }: {
   data: ControlPlaneData;
   href: (tab: ControlTab, patch?: Record<string, string | null>) => string;
   onNavigate: (event: MouseEvent<HTMLAnchorElement>) => void;
+  selectedRegion?: string | null;
+  onRegionChange?: (region: string | null) => void;
 }) {
   const id = useId();
   const { observations, unmapped } = carbonObservations(data);
   const regions = [...new Map(observations.map((o) => [o.region.id, o.region])).values()];
-  const [selection, setSelection] = useState('');
+  const [localSelection, setLocalSelection] = useState('');
+  const selection = selectedRegion === undefined ? localSelection : selectedRegion;
+  const setSelection = (region: string) => {
+    if (onRegionChange) onRegionChange(region || null);
+    else setLocalSelection(region);
+  };
   const [layer, setLayer] = useState<'intensity' | 'findings'>('intensity');
   const [zoom, setZoom] = useState(1);
   const [showRoutes, setShowRoutes] = useState(false);
@@ -47,8 +56,12 @@ export function CarbonAtlas({
       );
       return candidate ? [{ current, candidate }] : [];
     });
-  const active = regions.find((region) => region.id === selection) ?? regions[0];
-  const selected = observations.filter((o) => o.region.id === active?.id);
+  const active =
+    regions.find((region) => region.id === selection) ?? (onRegionChange ? undefined : regions[0]);
+  const selected =
+    onRegionChange && !active
+      ? observations
+      : observations.filter((o) => o.region.id === active?.id);
   const values = selected.flatMap((o) => (o.intensity === null ? [] : [o.intensity]));
   const findingCount = new Set(selected.map((o) => o.findingId)).size;
   const position = active ? mapPosition(active) : { x: 50, y: 50 };
@@ -256,6 +269,7 @@ export function CarbonAtlas({
             value={active?.id ?? ''}
             onChange={(e) => setSelection(e.target.value)}
           >
+            {onRegionChange && regions.length > 0 && <option value="">All regions</option>}
             {!regions.length && <option value="">No region data</option>}
             {regions.map((r) => (
               <option key={r.id} value={r.id}>

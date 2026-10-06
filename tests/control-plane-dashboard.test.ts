@@ -19,6 +19,7 @@ import {
 } from '../apps/CodeVitals-MCP/website/src/app/dashboard/control-plane/types';
 
 const navigation = vi.hoisted(() => ({ query: '', pathname: '/dashboard', push: vi.fn() }));
+const renderedLinks = vi.hoisted(() => [] as Array<Record<string, any>>);
 const store = vi.hoisted(() => ({
   proposals: [] as ApprovalProposal[],
   records: [] as ApprovalRecord[],
@@ -44,7 +45,10 @@ vi.mock('../apps/CodeVitals-MCP/website/node_modules/next/link', () => ({
     children: unknown;
     scroll?: boolean;
     prefetch?: boolean;
-  }) => createElement('a', { href, ...props }, children),
+  }) => {
+    renderedLinks.push({ href, scroll: _scroll, ...props });
+    return createElement('a', { href, ...props }, children);
+  },
 }));
 vi.mock('../apps/CodeVitals-MCP/website/src/app/dashboard/approval-inbox', () => ({
   useApprovalDecisions: (run: { runId: string } | null) => {
@@ -161,6 +165,7 @@ const links = (html: string) =>
   );
 
 beforeEach(() => {
+  renderedLinks.length = 0;
   navigation.query = '';
   navigation.pathname = '/dashboard';
   navigation.push.mockClear();
@@ -173,6 +178,62 @@ beforeEach(() => {
 });
 
 describe('complete control-plane page integration', () => {
+  it('separates detected problems from proposed changes', () => {
+    const findings = main(render('run=historic-run&tab=ai&section=findings'));
+    const recommendations = main(render('run=historic-run&tab=ai&section=recommendations'));
+    expect(findings).toContain('Historic finding evidence');
+    expect(recommendations).toContain('Recommended changes');
+    expect(recommendations).toContain('Before applying');
+    expect(recommendations).toContain('Review plan');
+    expect(recommendations).not.toContain('Resource findings');
+    expect(recommendations).not.toContain('Avoidable tokens by application');
+  });
+  it('explains empty architecture results and provides a data setup entry point', () => {
+    const html = render('run=historic-run&tab=arch');
+    expect(html).toContain('No architecture findings in this run and date window');
+    expect(html).toContain('Review your architecture / connect Azure');
+    expect(html).toContain('Empty does not mean your architecture was assessed and passed');
+  });
+  it('preserves scroll for specialist sections but resets it for main navigation', () => {
+    render('data=sample&tab=ai');
+    const pushState = vi.fn();
+    const scrollTo = vi.fn();
+    vi.stubGlobal('window', { history: { pushState }, scrollTo });
+    try {
+      for (const section of ['findings', 'recommendations', 'results', 'activity']) {
+        const link = renderedLinks.find(
+          (item) =>
+            new URL(item.href, 'https://dashboard.example').searchParams.get('section') === section,
+        )!;
+        expect(link).toBeDefined();
+        expect(link.scroll).toBe(false);
+        const preventDefault = vi.fn();
+        link.onClick({
+          button: 0,
+          preventDefault,
+          currentTarget: {
+            href: link.href,
+            dataset: { preserveScroll: link['data-preserve-scroll'] },
+          },
+        });
+        expect(preventDefault).toHaveBeenCalled();
+        expect(pushState).toHaveBeenLastCalledWith(null, '', link.href);
+        expect(scrollTo).not.toHaveBeenCalled();
+      }
+      const overview = renderedLinks.find(
+        (item) =>
+          new URL(item.href, 'https://dashboard.example').searchParams.get('tab') === 'overview',
+      )!;
+      overview.onClick({
+        button: 0,
+        preventDefault: vi.fn(),
+        currentTarget: { href: overview.href, dataset: {} },
+      });
+      expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'instant' });
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
   it.each(CONTROL_TABS)('renders the %s sample page with twelve grouped sidebar pages', (tab) => {
     const html = render(`data=sample&tab=${tab}`);
     const navigationHtml = nav(html);
@@ -396,11 +457,20 @@ describe('legacy dashboard route compatibility', () => {
 describe('integrated review and ledger scope', () => {
   it('keeps specialist landing pages compact with three findings and collapsed measurements', () => {
     const html = main(render('data=sample&tab=ai&range=1y'));
-    expect(html).toContain('Resources with findings');
+    expect(html).toContain('Requests analysed');
+    expect(html).toContain('Potentially avoidable tokens');
+    expect(html).toContain('Avoidable tokens by application');
+    expect(html).toContain('Estimated benefit');
+    expect(html).toContain('Where your decisions stand');
+    expect(html).toContain('Not applied · not verified');
+    expect(html).toContain('Before &amp; after');
     expect(html).toContain('Your next step');
     expect(html).toContain('Change checks passed');
     expect(html).toMatch(/View all \d+ findings/);
-    const table = html.match(/<table><caption[^>]*>Findings in this selection<\/caption>[\s\S]*?<\/table>/)?.[0] ?? '';
+    const table =
+      html.match(
+        /<table><caption[^>]*>Findings in this selection<\/caption>[\s\S]*?<\/table>/,
+      )?.[0] ?? '';
     expect((table.match(/<tbody>[\s\S]*?<\/tbody>/)?.[0].match(/<tr>/g) ?? []).length).toBe(3);
     expect(html).toMatch(/<details\b[^>]*><summary>Domain measurements/);
     expect(html).not.toContain('Before making a change');
@@ -411,6 +481,7 @@ describe('integrated review and ledger scope', () => {
     expect(html).toContain('Highest observed grid intensity');
     expect(html).toContain('Grid intensity is not total workload emissions');
     expect(html).toContain('Proposed routes off');
+    expect(html).toContain('All regions');
   });
   it.each(['carbon', 'waste', 'ai', 'arch', 'dr', 'collab'])(
     'gives %s four consistent URL-addressable sections',

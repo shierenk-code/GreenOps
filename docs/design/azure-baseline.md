@@ -1,6 +1,6 @@
 # Design: Azure subscription baseline and carbon translation engine
 
-Status: synthetic baseline, translation, seven-agent assessment and dashboard rollup are implemented in the local prototype (reviewed 6 October 2026). This document retains the design phases and formulas; see [current architecture](../architecture/overview.md) for execution/storage boundaries. Live Azure discovery and writes remain out of scope.
+Status: synthetic baseline, translation, seven-agent assessment and dashboard rollup are implemented in the local prototype. A limited read-only VMSS/autoscale configuration collector was added on 7 October 2026; see [data onboarding](../development/bring-your-own-data.md). Full live Azure baseline discovery and writes remain out of scope. This document retains the design phases and formulas; see [current architecture](../architecture/overview.md) for execution/storage boundaries.
 
 ## Goal
 

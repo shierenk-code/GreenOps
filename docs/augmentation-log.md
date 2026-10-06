@@ -53,13 +53,21 @@ See [submission status](SUBMISSION.md) and [dated validation history](developmen
 
 ## Integrity, data and human oversight
 
-- GreenOps includes pre-existing CodeVitals components and third-party dependencies, disclosed in the [README](../README.md#component-origin-and-third-party-dependencies). AI assistance or rebranding does not establish original authorship.
+- GreenOps includes pre-existing CodeVitals components and third-party dependencies. AI assistance or rebranding does not establish original authorship.
 - Use only public/open/synthetic evaluation data. Private environment files, account credentials and temporary run evidence are not submission assets.
 - Never include secrets in this log or recordings. Previously exposed credentials require rotation; deleting a displayed value is not rotation.
 - A dashboard approval saves a plan decision. Separate execution safeguards and before/after checks are required for supported changes. Production mutations must not be inferred from a UI badge.
 - Confirm the hackathon timeline, team contribution and pre-existing baseline manually. This log cannot certify competition eligibility.
 
 ## Maintaining this log
+
+**7 October 2026, browser architecture form:** Replaced JSON-download-first onboarding with an in-browser resource configuration form and immediate rule-based results. Unknown values do not become zero; input changes invalidate old results. Explicitly separated temporary form results from saved runs and Azure scanning. Image/PDF interpretation and account persistence are not implemented by this form.
+
+**7 October 2026, onboarding and navigation:** Added distinct recommendation cards, same-specialist scroll preservation, structured architecture validation/CLI assessment, and a limited read-only Azure VMSS/autoscale collector with dashboard setup instructions. Signed-in imports now direct users to sync. Synthetic architecture CLI execution produced three findings; 228 targeted checks and nine disposable-MongoDB integration tests passed. Corrected a POSIX permission assertion incorrectly applied on Windows; this does not validate Windows credential ACLs. Browser checks confirmed distinct tabs, preserved section scroll and invalid subscription handling. Live Azure access, full subscription discovery and production execution remain unverified or out of scope. Changes remain local; no production decisions or cloud resources were changed.
+
+**7 October 2026, specialist tab navigation:** Corrected the shared navigation handler that forced every section click to the page top. Findings, Recommendations, Results and Activity now preserve scroll, including the recorded-results link; main-page navigation retains its reset. TypeScript and 82 dashboard regression tests passed, including explicit scroll-handler coverage. Browser scroll behavior was not rechecked in this step. Changes remain local.
+
+**7 October 2026, specialist clarity:** Implemented AI workload metrics and a per-application token-opportunity chart, per-finding estimated benefits, explicit approval/application/check states and specialist-wide regional filtering. Avoided adding overlapping token estimates or crediting unused output allowance as savings. Updated regression tests and checked the recorded mock dashboard without submitting new decisions. Data remains finding-scoped; the overview map and separate sandbox keep their own scope.
 
 **6 October 2026, presentation packaging:** The user supplied the completed PowerPoint and its SharePoint link. Codex copied it unchanged to `docs/pitch-deck/Greenops.pptx`, verified matching SHA-256 hashes and counted 10 slides, then updated submission links. Codex did not author or revise the supplied slides in this step. Content accuracy, visual layout and judge access were not audited. At the user's request, the demo video entry uses the real shared-folder link until a direct file link is supplied; no video availability was verified.
 

@@ -55,6 +55,7 @@ import { ApprovalPage, ReviewDialog } from './audit-pages';
 import { Notifications } from './notifications';
 import { buildNotifications } from './notification-data';
 import { ExecutiveOverview } from './executive-overview';
+import { DataSetup } from './data-setup';
 import {
   AGENT_IDS,
   CONTROL_TABS,
@@ -217,6 +218,7 @@ export default function ControlPlaneDashboard({
     Array<{ id: string; input: ApprovalInput; at: string }>
   >([]);
   const [notice, setNotice] = useState('');
+  const [showDataSetup, setShowDataSetup] = useState(false);
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -372,7 +374,10 @@ export default function ControlPlaneDashboard({
       return;
     event.preventDefault();
     window.history.pushState(null, '', event.currentTarget.href);
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    const destinationTab = new URL(event.currentTarget.href, window.location?.origin || 'http://localhost').searchParams.get('tab');
+    if (event.currentTarget.dataset.preserveScroll !== 'true' && destinationTab !== activeTab) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
   }
   function review(id: string) {
     window.history.pushState(
@@ -835,10 +840,10 @@ export default function ControlPlaneDashboard({
             <button
               type="button"
               className={styles.textButton}
-              onClick={() => inputRef.current?.click()}
+              onClick={() => cloud ? setShowDataSetup(true) : inputRef.current?.click()}
             >
               <Upload size={14} aria-hidden="true" />
-              Import results
+              {cloud ? 'Sync your results' : 'Import results'}
             </button>
             <input
               ref={inputRef}
@@ -875,6 +880,8 @@ export default function ControlPlaneDashboard({
               {notice}
             </p>
           )}
+          <button type="button" className={styles.textButton} aria-expanded={showDataSetup} onClick={() => setShowDataSetup(!showDataSetup)}>{showDataSetup ? 'Hide data setup' : 'Review your architecture / connect Azure'}</button>
+          {showDataSetup && <DataSetup signedIn={Boolean(cloud)} />}
           <div className={styles.viewTransition} key={activeTab} data-view={activeTab}>
             {children ? (
               <div className={styles.embedded}>{children}</div>
@@ -910,6 +917,8 @@ export default function ControlPlaneDashboard({
             ) : activeTab === 'overview' ? (
               <ExecutiveOverview data={data} href={href} onNavigate={navigateTab} />
             ) : activeAgent ? (
+              <>
+              {activeAgent.key === 'arch' && data.opportunities.every((item) => item.agentKey !== 'arch') && <Empty>No architecture findings in this run and date window. Use “Review your architecture / connect Azure” above to assess your own input, or choose Sample scenarios. Empty does not mean your architecture was assessed and passed.</Empty>}
               <SpecialistWorkspace
                 agent={activeAgent}
                 data={data}
@@ -919,6 +928,7 @@ export default function ControlPlaneDashboard({
                 href={href}
                 onNavigate={navigateTab}
               />
+              </>
             ) : activeTab === 'investigations' ? (
               <InvestigationPage
                 key={search.get('q') ?? ''}

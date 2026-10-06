@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-location-assign-relative-destination -- Authentication changes require a full reload to clear account-scoped client state. */
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import styles from './cloud.module.css';
 const CloudContext = createContext(false);
 export const useCloud = () => useContext(CloudContext);
@@ -115,9 +116,10 @@ export function CloudWorkspace({ email, children }: { email: string; children: R
               onChange={(event) => {
                 const next = new URLSearchParams(search);
                 next.set('data', 'recorded');
+                next.delete('finding');
                 if (event.target.value) next.set('run', event.target.value);
                 else next.delete('run');
-                router.push(`/dashboard?${next}`);
+                router.push(`/dashboard?${next}`, { scroll: false });
               }}
             >
               <option value="">Latest synced run</option>
@@ -129,7 +131,7 @@ export function CloudWorkspace({ email, children }: { email: string; children: R
             </select>
           </label>
           <span>{runs.length} recent runs</span>
-          <a href="/dashboard?tab=results">Recorded evidence</a>
+          <Link scroll={false} href={`/dashboard?tab=results${search.get('run') ? `&run=${encodeURIComponent(search.get('run')!)}` : ''}`}>Recorded evidence</Link>
         </div>
         {link && (
           <div className={styles.connection}>

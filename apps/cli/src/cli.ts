@@ -17,6 +17,8 @@ import { ResultFormatter } from './formatter.js';
 import { runGreenOps } from './greenops-command.js';
 import { registerCarbonCommands } from './carbon-command.js';
 import { registerWasteCommands } from './waste-command.js';
+import { registerArchitectureCommands } from './architecture-command.js';
+import { registerAzureCommands } from './azure-command.js';
 import {
   SustainabilityReviewEngine,
   PolicyApprover,
@@ -342,6 +344,8 @@ export function createProgram(legacy = false): Command {
     : program;
 
   registerCloudCommands(greenopsCmd);
+  registerArchitectureCommands(greenopsCmd);
+  registerAzureCommands(greenopsCmd);
   let stopCloud: (() => Promise<void>) | undefined;
   greenopsCmd.hook('preAction', async (_thisCommand, actionCommand) => {
     if (!['run', 'review'].includes(actionCommand.name())) return;

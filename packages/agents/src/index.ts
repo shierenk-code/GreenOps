@@ -3,7 +3,7 @@ export * from './orchestrator.js';
 export { AiEfficiencyAgent } from './ai-efficiency.js';
 export { DigitalWasteAgent } from './digital-waste.js';
 export { CarbonIncidentAgent } from './carbon-incident.js';
-export { ArchitectureAgent } from './architecture.js';
+export { ArchitectureAgent, validateArchitecture } from './architecture.js';
 export { DisasterRecoveryAgent } from './disaster-recovery.js';
 export { CollaborationAgent } from './collaboration.js';
 export { PipelineEfficiencyAgent } from './pipeline-efficiency.js';

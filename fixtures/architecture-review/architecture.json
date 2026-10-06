@@ -1,0 +1,7 @@
+{
+  "stack": "synthetic-architecture-review",
+  "resources": [
+    { "name": "example-worker", "type": "vm_scale_set", "region": "eastus", "gridIntensityKgPerKwh": 0.45, "instanceCores": 8, "neededCores": 2, "autoscale": false },
+    { "name": "example-efficient-worker", "type": "vm_scale_set", "region": "northeurope", "gridIntensityKgPerKwh": 0.1, "instanceCores": 2, "neededCores": 2, "autoscale": true }
+  ]
+}

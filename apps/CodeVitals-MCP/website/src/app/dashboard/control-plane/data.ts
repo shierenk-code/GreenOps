@@ -11,6 +11,7 @@ import { buildAgentModule } from '../agent-module-data';
 import { buildOverviewData } from '../overview-data';
 import { buildImpactSummary } from '../impact-summary-data';
 import { resourcesFor, verificationFor } from './run-evidence';
+import { findingInsights } from './agent-insights';
 import {
   AGENT_IDS,
   SPECIALIST_KEYS,
@@ -237,6 +238,7 @@ export function buildRecordedData(
       const finding = selected.find((candidate) => candidate.bugId === row.id)!;
       const audit = buildFindingAudit(finding);
       opportunities.push({
+        ...findingInsights(finding),
         verification: verificationFor(finding),
         id: row.id,
         agentKey: key,

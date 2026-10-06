@@ -24,9 +24,61 @@ interface IacResource {
   neededCores: number;
   autoscale: boolean;
 }
-interface IacFixture {
+export interface IacFixture {
   stack: string;
   resources: IacResource[];
+}
+
+/** Validate user-supplied normalized input before running any rules. */
+export function validateArchitecture(value: unknown): IacFixture {
+  const record = (input: unknown): Record<string, unknown> => {
+    if (!input || typeof input !== 'object' || Array.isArray(input))
+      throw new Error('Architecture must contain JSON objects.');
+    return input as Record<string, unknown>;
+  };
+  const text = (input: unknown): string => {
+    if (
+      typeof input !== 'string' ||
+      !input.trim() ||
+      input.length > 200 ||
+      /[\x00-\x1f]/.test(input)
+    )
+      throw new Error(
+        'Architecture names and regions must be non-empty text, at most 200 characters.',
+      );
+    return input.trim();
+  };
+  const amount = (input: unknown, max: number): number => {
+    if (typeof input !== 'number' || !Number.isFinite(input) || input < 0 || input > max)
+      throw new Error(
+        'Architecture measurements must be finite non-negative numbers within supported limits.',
+      );
+    return input;
+  };
+  const doc = record(value);
+  if (!Array.isArray(doc.resources) || doc.resources.length > 500)
+    throw new Error('Architecture requires a resources array with at most 500 entries.');
+  const names = new Set<string>();
+  return {
+    stack: text(doc.stack),
+    resources: doc.resources.map((item) => {
+      const row = record(item);
+      const name = text(row.name);
+      if (names.has(name)) throw new Error('Architecture resource names must be unique.');
+      names.add(name);
+      if (typeof row.autoscale !== 'boolean')
+        throw new Error('autoscale must be true or false, not a string.');
+      return {
+        name,
+        type: text(row.type),
+        region: text(row.region),
+        gridIntensityKgPerKwh: amount(row.gridIntensityKgPerKwh, 10),
+        instanceCores: amount(row.instanceCores, 100000),
+        neededCores: amount(row.neededCores, 100000),
+        autoscale: row.autoscale,
+      };
+    }),
+  };
 }
 
 export class ArchitectureAgent implements SpecializedAgent {
@@ -40,7 +92,7 @@ export class ArchitectureAgent implements SpecializedAgent {
       const result = scanArchitectureBaseline(loadBaselineBundle(sourcePath));
       return { agentId: this.id, agentName: this.name, ...result };
     }
-    const fx = readJsonFixture<IacFixture>(sourcePath);
+    const fx = validateArchitecture(readJsonFixture<unknown>(sourcePath));
     const bugs: SustainabilityBug[] = [];
     const CLEAN_REGION_INTENSITY = 0.1; // kgCO2e/kWh — a low-carbon region target
 
