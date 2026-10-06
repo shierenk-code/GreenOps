@@ -12,7 +12,7 @@
     "ignore": "^7.0.10"
   },
   "devDependencies": {
-    "@types/node": "^20.14.10"
+    "@types/node": "^26.6.4"
   },
   "scripts": {
     "build": "tsc -b",
