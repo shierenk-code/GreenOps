@@ -15,7 +15,7 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.5.0",
+    "@modelcontextprotocol/sdk": "^1.32.0",
     "glob": "^10.3.10",
     "semver": "^7.6.0",
     "typescript": "^5.9.3",
