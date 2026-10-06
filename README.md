@@ -12,7 +12,8 @@ A sustainability control plane that finds digital waste, explains recommendation
 
 - **Code:** [develop branch](https://github.com/shierenk-code/GreenOps/tree/develop).
 - **Pitch deck (10 slides):** [Download from the repository](docs/pitch-deck/Greenops.pptx) · [Open in SharePoint](https://nagarro-my.sharepoint.com/:p:/r/personal/shieren_khan_nagarro_com/_layouts/15/Doc.aspx?sourcedoc=%7B4E98484E-76A2-4179-AF45-EB7E98F22743%7D&file=Greenops.pptx&action=edit&mobileredirect=true&wdwpf=t). Confirm judge access to the shared link.
-- **Demo video:** [Greenops - Flo hackathon shared folder](https://nagarro-my.sharepoint.com/my?id=%2Fpersonal%2Fshieren%5Fkhan%5Fnagarro%5Fcom%2FDocuments%2FGreenops%20%2D%20Flo%20hackathon&viewid=49969cbc%2D7e25%2D4e29%2Db4a1%2D05b80f4e1c51).
+- **Demo video:** [Greenops - Flo hackathon demovideo](https://nagarro-my.sharepoint.com/:v:/r/personal/shieren_khan_nagarro_com/Documents/Greenops%20-%20Flo%20hackathon/GreenOps-Full-Demo.mp4?d=w47ca091fbf0747be863d3bde5761a2ea&csf=1&web=1&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=5zguia).
+this video will not show the login path for host website, to see that use this video [Greenops - Flo hackathon login](https://nagarro-my.sharepoint.com/personal/shieren_khan_nagarro_com/_layouts/15/stream.aspx?id=%2Fpersonal%2Fshieren%5Fkhan%5Fnagarro%5Fcom%2FDocuments%2FGreenops%20%2D%20Flo%20hackathon%2Fexport%2D1791320401845%2Dthird%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2Ec89b056d%2D5511%2D4ae7%2D884c%2D0523f8384e27).
 - **AI usage documentation:** [Augmentation log](docs/augmentation-log.md). See [submission assets checklist](docs/submission-assets.md) for remaining deliverables.
 
 ## Try the hosted dashboard
