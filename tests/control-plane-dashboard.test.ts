@@ -299,6 +299,14 @@ describe('complete control-plane page integration', () => {
     },
   );
 
+  it('keeps the appearance menu closed until the user opens it', () => {
+    const html = render('data=sample');
+    expect(html).toContain('aria-label="Choose appearance"');
+    expect(html).toContain('aria-expanded="false"');
+    expect(html).toContain('role="menu" aria-label="Dashboard theme" hidden=""');
+    expect(html).not.toContain('Make it your workspace');
+  });
+
   it('keeps the second theme selected across dashboard navigation', () => {
     const html = render('data=sample&theme=olive');
     for (const url of links(html)) {

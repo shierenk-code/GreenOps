@@ -144,8 +144,10 @@ export default function ControlPlaneDashboard({
   const router = useRouter();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const mobileToggle = useRef<HTMLButtonElement>(null);
   const mobileCloseRef = useRef<HTMLButtonElement>(null);
+  const appearanceRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!mobileOpen) return;
     mobileCloseRef.current?.focus();
@@ -161,6 +163,22 @@ export default function ControlPlaneDashboard({
       document.body.style.overflow = previousOverflow;
     };
   }, [mobileOpen]);
+  useEffect(() => {
+    if (!themeMenuOpen) return;
+    const closeWhenLeaving = (event: PointerEvent) => {
+      if (event.target instanceof Node && !appearanceRef.current?.contains(event.target))
+        setThemeMenuOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setThemeMenuOpen(false);
+    };
+    document.addEventListener('pointerdown', closeWhenLeaving);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeWhenLeaving);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [themeMenuOpen]);
   const pathname = usePathname();
   const search = useSearchParams();
   const query = search.toString();
@@ -193,8 +211,10 @@ export default function ControlPlaneDashboard({
     }
   }, [cached]);
   const [loaded, setLoaded] = useState<{ ledger: LedgerFile; fileName: string } | null>(null);
-  const ledger = cloud ? initialLedger : loaded?.ledger ?? uploaded?.ledger ?? initialLedger;
-  const fileName = cloud ? initialFileName : loaded?.fileName ?? uploaded?.fileName ?? initialFileName;
+  const ledger = cloud ? initialLedger : (loaded?.ledger ?? uploaded?.ledger ?? initialLedger);
+  const fileName = cloud
+    ? initialFileName
+    : (loaded?.fileName ?? uploaded?.fileName ?? initialFileName);
   const requestedRun = search.get('run');
   const run = useMemo(() => selectDashboardRun(ledger, requestedRun), [ledger, requestedRun]);
   const findings = useMemo(() => findingsFromRun(run), [run]);
@@ -422,7 +442,10 @@ export default function ControlPlaneDashboard({
     update({ data: 'recorded', run: selectLatestRun(next)?.runId ?? null });
   }
   async function importFile(file?: File) {
-    if (cloud) { setError('Use your connected terminal to sync recorded evidence.'); return; }
+    if (cloud) {
+      setError('Use your connected terminal to sync recorded evidence.');
+      return;
+    }
     if (!file) return;
     const request = ++loadRequest.current;
     setRefreshing(false);
@@ -441,7 +464,11 @@ export default function ControlPlaneDashboard({
     }
   }
   async function refresh() {
-    if (cloud) { router.refresh(); setNotice('Refreshing your account’s recorded evidence.'); return; }
+    if (cloud) {
+      router.refresh();
+      setNotice('Refreshing your account’s recorded evidence.');
+      return;
+    }
     const request = ++loadRequest.current;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
@@ -758,12 +785,24 @@ export default function ControlPlaneDashboard({
               <option value="30d">Last 30 Days</option>
               <option value="1y">Last Year</option>
             </select>
-            <details className={styles.appearance}>
-              <summary aria-label="Choose appearance" title="Choose appearance">
+            <div className={styles.appearance} ref={appearanceRef}>
+              <button
+                className={styles.appearanceButton}
+                type="button"
+                aria-label="Choose appearance"
+                title="Choose appearance"
+                aria-expanded={themeMenuOpen}
+                aria-haspopup="menu"
+                onClick={() => setThemeMenuOpen((open) => !open)}
+              >
                 <Palette size={18} aria-hidden="true" />
-              </summary>
-              <div className={styles.themePopover}>
-                <p>Make it your workspace</p>
+              </button>
+              <div
+                className={styles.themePopover}
+                role="menu"
+                aria-label="Dashboard theme"
+                hidden={!themeMenuOpen}
+              >
                 <div className={styles.themes} role="group" aria-label="Dashboard theme">
                   {THEMES.map((option) => {
                     const Icon = option.icon;
@@ -774,7 +813,12 @@ export default function ControlPlaneDashboard({
                         title={option.name}
                         aria-label={option.name}
                         aria-pressed={theme === option.id}
-                        onClick={() => update({ theme: option.id === 'sunset' ? null : option.id })}
+                        role="menuitemradio"
+                        aria-checked={theme === option.id}
+                        onClick={() => {
+                          update({ theme: option.id === 'sunset' ? null : option.id });
+                          setThemeMenuOpen(false);
+                        }}
                       >
                         <Icon size={16} aria-hidden="true" />
                       </button>
@@ -782,7 +826,7 @@ export default function ControlPlaneDashboard({
                   })}
                 </div>
               </div>
-            </details>
+            </div>
             <Notifications
               items={notifications}
               href={(item) => href(item.tab, item.findingId ? { finding: item.findingId } : {})}

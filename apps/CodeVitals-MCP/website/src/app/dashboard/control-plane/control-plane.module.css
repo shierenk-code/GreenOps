@@ -1341,7 +1341,7 @@
 .appearance {
   position: relative;
 }
-.appearance > summary {
+.appearanceButton {
   display: grid;
   place-items: center;
   width: 40px;
@@ -1353,37 +1353,36 @@
   list-style: none;
   cursor: pointer;
 }
-.appearance > summary::-webkit-details-marker {
-  display: none;
+.appearanceButton[aria-expanded='true'] {
+  border-color: var(--cp-action);
+  color: var(--cp-text);
+  background: var(--cp-action);
 }
 .themePopover {
   position: absolute;
-  top: calc(100% + 12px);
+  top: calc(100% + 8px);
   right: 0;
-  width: 262px;
-  padding: 18px;
+  width: 132px;
+  padding: 8px;
   border: 1px solid var(--cp-border);
-  border-radius: 12px;
+  border-radius: 9px;
   background: var(--cp-surface);
-  box-shadow: 0 15px 40px #0002;
+  box-shadow: 0 10px 24px #0002;
   z-index: 60;
 }
-.themePopover p {
-  margin-bottom: 12px;
-  font-size: 12px;
-  color: var(--cp-text);
-}
 .themes {
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   border: 0;
   padding: 0;
   background: transparent;
-  gap: 3px;
+  gap: 5px;
 }
 .themes button {
+  width: 34px;
   min-width: 34px;
-  min-height: 38px;
-  border-radius: 6px;
+  min-height: 34px;
+  border-radius: 5px;
 }
 .root[data-theme='sunset'] {
   --cp-chart-primary: #cc4c22;
@@ -1573,7 +1572,7 @@
       opacity: 1;
     }
   }
-  .themePopover {
+  .themePopover:not([hidden]) {
     animation: workspaceEnter 0.2s ease;
   }
 }
@@ -1733,11 +1732,6 @@
   .panel {
     padding: 18px;
   }
-  .themePopover {
-    position: fixed;
-    top: 142px;
-    right: 14px;
-  }
   .chartToolbar button,
   .chartToolbar select {
     min-height: 44px;
@@ -1775,7 +1769,9 @@
 }
 
 /* Studio: the current reference's full-width grid, neutral canvas and pixel accents. */
-.studioNav { display: none; }
+.studioNav {
+  display: none;
+}
 .root[data-theme='sunset'] {
   --go-display: var(--go-sans);
   --cp-bg: #fafaf8;
@@ -1797,7 +1793,9 @@
   --cp-radius: 0px;
   display: block;
 }
-.root[data-theme='sunset'] :where(button, select, input, summary, article, section) { border-radius: 0; }
+.root[data-theme='sunset'] :where(button, select, input, summary, article, section) {
+  border-radius: 0;
+}
 .root[data-theme='sunset'] .studioNav {
   display: flex;
   align-items: stretch;
@@ -1808,7 +1806,8 @@
   border-bottom: 1px solid var(--cp-border);
   background: var(--cp-surface);
 }
-.studioNav > a, .studioMenu > summary {
+.studioNav > a,
+.studioMenu > summary {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1820,47 +1819,190 @@
   white-space: nowrap;
   color: var(--cp-text);
   list-style: none;
-  transition: background 180ms, color 180ms;
+  transition:
+    background 180ms,
+    color 180ms;
 }
-.studioMenu > summary::-webkit-details-marker { display: none; }
-.studioNav > .studioBrand { font-size: 24px; font-weight: 600; letter-spacing: -1.2px; gap: 10px; }
-.studioNav > a:hover, .studioMenu > summary:hover, .studioMenu[open] > summary, .studioNav [aria-current='page'] { background: var(--cp-soft); text-decoration: none; }
-.studioNav > .studioCta { margin-left: auto; background: #19191c; color: #fff; }
-.studioNav > .studioCta:hover { background: #ff501f; color: #19191c; }
-.studioCta span { font-size: 11px; border: 1px solid #ffffff60; padding: 2px 6px; }
-.studioMenu { position: relative; }
-.studioMenu > summary { height: 100%; }
-.studioDropdown { position: absolute; top: 100%; left: -1px; width: 340px; background: var(--cp-surface); border: 1px solid var(--cp-border); box-shadow: 0 16px 30px #0000000a; }
-.studioDropdown p { padding: 22px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--cp-muted); }
-.studioDropdown a { display: flex; justify-content: space-between; gap: 10px; padding: 19px 22px; border-top: 1px solid var(--cp-border); color: var(--cp-text); }
-.studioDropdown a:hover { background: #ffb000; text-decoration: none; }
-.root[data-theme='sunset'] .workspace .header { background: var(--cp-surface); padding: 12px 24px; min-height: 64px; backdrop-filter: none; position: relative; top: auto; z-index: 40; border-bottom: 1px solid var(--cp-border); }
-.root[data-theme='sunset'] .collapseToggle { display: none; }
-.root[data-theme='sunset'] .workspace .main { padding: 32px clamp(16px, 4vw, 64px); }
-.root[data-theme='sunset'] .workspace .main:has([data-view='overview']) { padding: 0; }
-.root[data-theme='sunset'] .workspace .datasetBar { background: var(--cp-soft); padding: 10px 24px; }
-.root[data-theme='sunset'] :is(.panel, .globalSearch, .appearance > summary, .themePopover, .textButton, .metric, .notificationButton) { border-radius: 0; box-shadow: none; }
-.root[data-theme='sunset'] .workspace .controls select { border-radius: 0; }
-.root[data-theme='sunset'] .metric strong { font-family: var(--go-sans); }
-.root[data-theme='sunset'] .footer { margin-top: 64px; padding: 44px 4%; background: #19191c; color: #eaeae6; border-top: 8px solid #ff8200; border-image: none; }
-.root[data-theme='sunset'] .footer a { color: #ffb000; }
-@media (min-width: 721px) { .root[data-theme='sunset'] .sidebar { display: none; } }
+.studioMenu > summary::-webkit-details-marker {
+  display: none;
+}
+.studioNav > .studioBrand {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -1.2px;
+  gap: 10px;
+}
+.studioNav > a:hover,
+.studioMenu > summary:hover,
+.studioMenu[open] > summary,
+.studioNav [aria-current='page'] {
+  background: var(--cp-soft);
+  text-decoration: none;
+}
+.studioNav > .studioCta {
+  margin-left: auto;
+  background: #19191c;
+  color: #fff;
+}
+.studioNav > .studioCta:hover {
+  background: #ff501f;
+  color: #19191c;
+}
+.studioCta span {
+  font-size: 11px;
+  border: 1px solid #ffffff60;
+  padding: 2px 6px;
+}
+.studioMenu {
+  position: relative;
+}
+.studioMenu > summary {
+  height: 100%;
+}
+.studioDropdown {
+  position: absolute;
+  top: 100%;
+  left: -1px;
+  width: 340px;
+  background: var(--cp-surface);
+  border: 1px solid var(--cp-border);
+  box-shadow: 0 16px 30px #0000000a;
+}
+.studioDropdown p {
+  padding: 22px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--cp-muted);
+}
+.studioDropdown a {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 19px 22px;
+  border-top: 1px solid var(--cp-border);
+  color: var(--cp-text);
+}
+.studioDropdown a:hover {
+  background: #ffb000;
+  text-decoration: none;
+}
+.root[data-theme='sunset'] .workspace .header {
+  background: var(--cp-surface);
+  padding: 12px 24px;
+  min-height: 64px;
+  backdrop-filter: none;
+  position: relative;
+  top: auto;
+  z-index: 40;
+  border-bottom: 1px solid var(--cp-border);
+}
+.root[data-theme='sunset'] .collapseToggle {
+  display: none;
+}
+.root[data-theme='sunset'] .workspace .main {
+  padding: 32px clamp(16px, 4vw, 64px);
+}
+.root[data-theme='sunset'] .workspace .main:has([data-view='overview']) {
+  padding: 0;
+}
+.root[data-theme='sunset'] .workspace .datasetBar {
+  background: var(--cp-soft);
+  padding: 10px 24px;
+}
+.root[data-theme='sunset']
+  :is(
+    .panel,
+    .globalSearch,
+    .appearanceButton,
+    .themePopover,
+    .textButton,
+    .metric,
+    .notificationButton
+  ) {
+  border-radius: 0;
+  box-shadow: none;
+}
+.root[data-theme='sunset'] .workspace .controls select {
+  border-radius: 0;
+}
+.root[data-theme='sunset'] .metric strong {
+  font-family: var(--go-sans);
+}
+.root[data-theme='sunset'] .footer {
+  margin-top: 64px;
+  padding: 44px 4%;
+  background: #19191c;
+  color: #eaeae6;
+  border-top: 8px solid #ff8200;
+  border-image: none;
+}
+.root[data-theme='sunset'] .footer a {
+  color: #ffb000;
+}
+@media (min-width: 721px) {
+  .root[data-theme='sunset'] .sidebar {
+    display: none;
+  }
+}
 @media (max-width: 1050px) {
-  .studioNav > a, .studioMenu > summary { padding: 16px; font-size: 12px; }
-  .studioNav > .studioBrand { font-size: 21px; }
-  .studioCta span { display: none; }
+  .studioNav > a,
+  .studioMenu > summary {
+    padding: 16px;
+    font-size: 12px;
+  }
+  .studioNav > .studioBrand {
+    font-size: 21px;
+  }
+  .studioCta span {
+    display: none;
+  }
 }
 @media (max-width: 720px) {
-  .root[data-theme='sunset'] .studioNav { position: relative; min-height: 60px; }
-  .studioNav > a:not(.studioBrand):not(.studioCta), .studioMenu { display: none; }
-  .studioNav > .studioBrand { font-size: 23px; }
-  .studioNav > .studioCta { font-size: 10px; padding: 12px; gap: 8px; white-space: normal; }
-  .root[data-theme='sunset'] .workspace .header { padding: 12px 16px; }
-  .root[data-theme='sunset'] .sidebar { background: var(--cp-surface); }
-  .root[data-theme='sunset'] .sideNav a { border-radius: 0; }
-  .root[data-theme='sunset'] .sideNav a[aria-current='page'] { color: #19191c; background: #ffb000; border-color: #ff501f; }
-  .root[data-theme='sunset'] .sidebarNote { background: var(--cp-soft); border-radius: 0; }
-  .root[data-theme='sunset'] .workspace .datasetBar { padding: 12px 16px; }
-  .root[data-theme='sunset'] .workspace .main { padding: 16px; }
+  .root[data-theme='sunset'] .studioNav {
+    position: relative;
+    min-height: 60px;
+  }
+  .studioNav > a:not(.studioBrand):not(.studioCta),
+  .studioMenu {
+    display: none;
+  }
+  .studioNav > .studioBrand {
+    font-size: 23px;
+  }
+  .studioNav > .studioCta {
+    font-size: 10px;
+    padding: 12px;
+    gap: 8px;
+    white-space: normal;
+  }
+  .root[data-theme='sunset'] .workspace .header {
+    padding: 12px 16px;
+  }
+  .root[data-theme='sunset'] .sidebar {
+    background: var(--cp-surface);
+  }
+  .root[data-theme='sunset'] .sideNav a {
+    border-radius: 0;
+  }
+  .root[data-theme='sunset'] .sideNav a[aria-current='page'] {
+    color: #19191c;
+    background: #ffb000;
+    border-color: #ff501f;
+  }
+  .root[data-theme='sunset'] .sidebarNote {
+    background: var(--cp-soft);
+    border-radius: 0;
+  }
+  .root[data-theme='sunset'] .workspace .datasetBar {
+    padding: 12px 16px;
+  }
+  .root[data-theme='sunset'] .workspace .main {
+    padding: 16px;
+  }
 }
-@media print { .root[data-theme='sunset'] .studioNav { display: none; } }
+@media print {
+  .root[data-theme='sunset'] .studioNav {
+    display: none;
+  }
+}
