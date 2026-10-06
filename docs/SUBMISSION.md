@@ -4,7 +4,7 @@ Reviewed against the local checkout on **6 October 2026**. This is an implementa
 
 Repository: [shierenk-code/GreenOps](https://github.com/shierenk-code/GreenOps). Submit the exact reviewed branch/commit and confirm judge access if private.
 
-Submission branch: [develop](https://github.com/shierenk-code/GreenOps/tree/develop). The [augmentation log](augmentation-log.md) documents AI assistance, revisions and verification limits. The [assets checklist](submission-assets.md) links the supplied [10-slide pitch deck](Greenops.pptx), its SharePoint location and the shared folder for the demo video. Confirm judge access before submission.
+Submission branch: [develop](https://github.com/shierenk-code/GreenOps/tree/develop). The [augmentation log](augmentation-log.md) documents AI assistance, revisions and verification limits. The [assets checklist](submission-assets.md) links the supplied [10-slide pitch deck](pitch-deck/Greenops.pptx), its SharePoint location and the shared folder for the demo video. Confirm judge access before submission.
 
 ## What a judge can run
 

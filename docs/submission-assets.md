@@ -8,7 +8,7 @@ Owner: Shieren Khan. Updated: 6 October 2026.
 
 The pitch deck is supplied and copied unchanged into this repository. The demo video entry points to the shared folder above. Judge access to SharePoint has not been verified. Do not include passwords or access tokens in the repository.
 
-**Presentation:** [Repository copy](Greenops.pptx) · [Open in SharePoint](https://nagarro-my.sharepoint.com/:p:/r/personal/shieren_khan_nagarro_com/_layouts/15/Doc.aspx?sourcedoc=%7B4E98484E-76A2-4179-AF45-EB7E98F22743%7D&file=Greenops.pptx&action=edit&mobileredirect=true&wdwpf=t).
+**Presentation:** [Repository copy](pitch-deck/Greenops.pptx) · [Open in SharePoint](https://nagarro-my.sharepoint.com/:p:/r/personal/shieren_khan_nagarro_com/_layouts/15/Doc.aspx?sourcedoc=%7B4E98484E-76A2-4179-AF45-EB7E98F22743%7D&file=Greenops.pptx&action=edit&mobileredirect=true&wdwpf=t).
 
 The supplied deck contains 10 slides, within the requested 8–10-slide limit. File integrity and slide count were checked; content coverage and visual layout have not been audited in this packaging step. The repository copy is a snapshot, not a live sync of SharePoint edits.
 
@@ -16,7 +16,7 @@ The supplied deck contains 10 slides, within the requested 8–10-slide limit. F
 | --- | --- |
 | Setup, run instructions, sample data, limitations | [README](../README.md) |
 | Agent design document | [Architecture](architecture/overview.md); verify the submission includes the required architecture diagram, goal/user, sources/tools, orchestration, decisions, oversight and failure handling |
-| Pitch deck, 8–10 slides | Supplied: [10-slide deck](Greenops.pptx) under `/docs`, with SharePoint and README links |
+| Pitch deck, 8–10 slides | Supplied: [10-slide deck](pitch-deck/Greenops.pptx) under `/docs/pitch-deck/`, with SharePoint and README links |
 | Running-agent demo, 3–5 minutes | Shared folder above; replace the folder reference with a direct video link when supplied. Required for pre-screening |
 | Augmentation log | [AI usage documentation](augmentation-log.md) |
 
