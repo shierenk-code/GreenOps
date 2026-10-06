@@ -1,5 +1,7 @@
 # GreenOps architecture
 
+For the supplied target-design diagrams, see [architecture submission assets (PDF and PNG)](README.md). The implementation reference below distinguishes current capabilities from that target design.
+
 Implementation reference, reviewed 6 October 2026. Start with the [quick start](../../README.md#quick-start); this document describes the current code, not a target architecture.
 
 ## System boundaries

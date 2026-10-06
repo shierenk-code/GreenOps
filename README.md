@@ -8,6 +8,8 @@ A sustainability control plane that finds digital waste, explains recommendation
 
 ## Hackathon submission
 
+- **Architecture documents:** [Target architecture and executive overview — PDF and PNG](docs/architecture/README.md). These describe the target design; [current implementation](docs/architecture/overview.md) documents prototype capabilities and limitations.
+
 - **Code:** [develop branch](https://github.com/shierenk-code/GreenOps/tree/develop).
 - **Pitch deck (10 slides):** [Download from the repository](docs/pitch-deck/Greenops.pptx) · [Open in SharePoint](https://nagarro-my.sharepoint.com/:p:/r/personal/shieren_khan_nagarro_com/_layouts/15/Doc.aspx?sourcedoc=%7B4E98484E-76A2-4179-AF45-EB7E98F22743%7D&file=Greenops.pptx&action=edit&mobileredirect=true&wdwpf=t). Confirm judge access to the shared link.
 - **Demo video:** [Greenops - Flo hackathon shared folder](https://nagarro-my.sharepoint.com/my?id=%2Fpersonal%2Fshieren%5Fkhan%5Fnagarro%5Fcom%2FDocuments%2FGreenops%20%2D%20Flo%20hackathon&viewid=49969cbc%2D7e25%2D4e29%2Db4a1%2D05b80f4e1c51).
@@ -35,7 +37,7 @@ Expected: **31 findings across seven specialists**, a synthetic subscription bas
 
 ### 2. Open the dashboard
 
-In a second terminal, start from the repository root:
+Continue in the **same terminal** after step 1 finishes. You should still be inside the `GreenOps` repository folder; do not open a second terminal for this step.
 
 ```powershell
 cd apps/CodeVitals-MCP/website
@@ -44,7 +46,7 @@ $env:GREENOPS_LEDGER_PATH = "../../../.tmp/judge-baseline.json"
 npm.cmd run dev -- --port 3003
 ```
 
-Open [the dashboard](http://127.0.0.1:3003/dashboard). Keep this terminal running.
+Open [the dashboard](http://127.0.0.1:3003/dashboard). Keep this terminal running while using the dashboard. If a dashboard is already running on port 3003, use that instance or stop it with `Ctrl+C` in its terminal before starting another.
 
 For this no-database path, leave `MONGODB_URI`, `WEBSITE_HOSTNAME` and an HTTPS `GREENOPS_PUBLIC_URL` unset. Existing MongoDB configuration selects account mode instead; see [setup and troubleshooting](docs/development/getting-started.md).
 
