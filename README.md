@@ -27,12 +27,22 @@ Open [GreenOps hosted demo](https://greenops-ewawfqghfeahc4hs.westus3-01.azurewe
 
 Browser sign-in and terminal connection are separate. After completing local installation and generating the sample ledger in step 1 below, run these commands from the **repository root**, not the website folder. No local dashboard server is required for hosted sync.
 
-In the signed-in hosted dashboard, click **Connect terminal** to generate a fresh connection URL. Paste only that URL—not an entire command—inside the quotes:
+First, return to the folder where you cloned `GreenOps`. If your terminal is currently in `GreenOps/apps/CodeVitals-MCP/website`, run:
+
+```powershell
+Set-Location ../../..
+```
+
+From any other location, use `Set-Location 'C:\path\to\GreenOps'`, replacing the example with your actual clone folder. If the local dashboard is running in your terminal, leave it running and open another terminal for these connection commands, then explicitly enter the repository folder there.
+
+In the signed-in hosted dashboard, click **Connect terminal** to generate a fresh connection URL. Paste only that URL—not an entire command—inside the quotes. Keep a **space between `connect` and the opening quote**:
 
 ```powershell
 pnpm.cmd greenops connect 'PASTE_FRESH_CONNECTION_URL_HERE'
 pnpm.cmd greenops sync --ledger ./.tmp/judge-baseline.json --project greenops-demo
 ```
+
+If you see `Command "greenops" not found`, check that you are in the repository root rather than the website folder and that installation in step 1 completed. The syntax is `connect 'URL'`, not `connect'URL'`. The sample ledger must already exist before syncing.
 
 Wait for the connection to succeed before syncing. Keep the connection URL private. If sync reports an expired/revoked refresh token, generate a fresh link and repeat `connect`, then retry `sync`; the assessment does not need to be rerun. Azure CLI login is separate from this GreenOps account connection.
 
