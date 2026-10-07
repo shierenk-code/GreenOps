@@ -107,6 +107,57 @@ The shared workflow detects, investigates, compares options, estimates impact, r
 
 ## Data and model
 
+### Run with Google Gemini (optional)
+
+After installation, enter the **GreenOps repository root** and open your private configuration. Choose the commands for your terminal and replace the example path with your actual clone folder.
+
+**PowerShell:**
+
+```powershell
+Set-Location "C:\path\to\GreenOps"
+notepad .env.local
+```
+
+**Windows Command Prompt (CMD):**
+
+```cmd
+cd /d "C:\path\to\GreenOps"
+notepad .env.local
+```
+
+Add or update these settings in the editor, preserving any existing settings, then save and close it:
+
+```dotenv
+GREENOPS_LLM_PROVIDER=gemini
+GEMINI_API_KEY=YOUR_PRIVATE_API_KEY
+GEMINI_MODEL=YOUR_ENABLED_GEMINI_MODEL_ID
+```
+
+Replace both placeholders. Use an API model enabled for your Google API project; a consumer Gemini Pro subscription alone is not an API key. Never commit this file or show the key in a demo. This run sends analysis context to Google and may incur API charges; use the supplied synthetic fixture, not customer data.
+
+Run the assessment from that repository-root terminal. This command works in both PowerShell and CMD:
+
+```powershell
+pnpm.cmd greenops run ./fixtures/azure-baseline --fleet --provider gemini --ledger ./.tmp/azure-baseline-gemini-review.json
+```
+
+To view this result:
+
+- **Hosted/account dashboard:** sign in and click **Connect terminal**. Replace the placeholder below with only the fresh URL. Run `connect` first and wait for success, then run `sync`. Double quotes work in both PowerShell and CMD; keep the space after `connect`.
+
+```text
+pnpm.cmd greenops connect "PASTE_FRESH_CONNECTION_URL_HERE"
+pnpm.cmd greenops sync --ledger ./.tmp/azure-baseline-gemini-review.json --project greenops-gemini
+```
+
+Select the new run in **Run history** with **Recorded analysis** selected. If the terminal is already connected to the intended account and server, only the sync command is needed.
+
+- **Local no-database dashboard:** use **Import results** to open `.tmp/azure-baseline-gemini-review.json`.
+
+Inspect the recommendation source and investigation evidence for model/status/usage. A completed command can include **rule-based fallback** if Gemini failed; completion alone is not proof that the LLM ran successfully. Approval still does not automatically apply a change. For interactive model testing, see [Gemini setup and dashboard sandbox](docs/development/getting-started.md#google-gemini).
+
+### Data sources
+
 To assess your own architecture or a permitted Azure test subscription, use [Bring your own data](docs/development/bring-your-own-data.md). Azure coverage currently checks VM scale-set autoscale configuration only—not a full subscription baseline.
 
 - **Main dataset:** [Azure subscription fixtures](fixtures/azure-baseline), an explicitly synthetic subscription with teams, resources and factors. Expected counts: Waste 13, AI 5, Pipeline 4, DR 3, Carbon 2, Architecture 2, Collaboration 2.
